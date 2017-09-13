@@ -1,0 +1,20 @@
+{
+    "name": "bit-oasis/bitfinex-api",
+    "require": {
+        "nette/utils": "^2.4",
+        "react/react": "dev-master",
+        "ratchet/pawl": "^0.2.3",
+        "psr/log": "^1.0"
+    },
+    "authors": [
+        {
+            "name": "Daniel Robenek",
+            "email": "daniel.robenek@me.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "BitOasis\\Bitfinex\\": "src/BitOasis/Bitfinex"
+        }
+    }
+}
