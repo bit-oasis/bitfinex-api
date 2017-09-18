@@ -13,6 +13,9 @@ use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\MessageInterface;
 use React\EventLoop\LoopInterface;
+use React\EventLoop\Timer\TimerInterface;
+use React\Promise\Deferred;
+use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
 /**
@@ -38,8 +41,14 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 	/** @var string */
 	protected $origin = 'localhost';
 
-	/** @var bool */
-	protected $running = false;
+	/** @var WebSocket|null */
+	protected $connection;
+
+	/** @var Deferred|null */
+	protected $closeDeferred;
+
+	/** @var TimerInterface|null */
+	protected $reconnectTimer;
 
 	public function __construct(string $apiKey = null, string $apiSecret = null, LoopInterface $loop) {
 		$this->apiKey = $apiKey;
@@ -53,10 +62,10 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 	 * @throws CannotAddSubscriberException
 	 */
 	public function addSubscriber(BitfinexWebsocketSubscriber $subscriber) {
-		if ($this->running) {
+		if ($this->isRunning()) {
 			throw new CannotAddSubscriberException("Can't add subscriber when websocket is connected and running!");
 		}
-	    $this->subscribers[] = $subscriber;
+		$this->subscribers[] = $subscriber;
 		$this->logger->debug('New subscriber {subscriber}', ['subscriber' => $subscriber]);
 	}
 
@@ -70,7 +79,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 	public function connect(): PromiseInterface {
 		$connector = new Connector($this->loop);
 		return $connector(self::WEBSOCKET_URL, [], ['Origin' => $this->origin])->then(function(WebSocket $conn) {
-			$this->running = true;
+			$this->connection = $conn;
 
 			$conn->on('message', function(MessageInterface $msg) use($conn) {
 				$data = Json::decode($msg, JSON_OBJECT_AS_ARRAY);
@@ -134,14 +143,20 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 			});
 
 			$conn->on('close', function($code = null, $reason = null) {
-				$this->running = false;
 				$this->logger->info('Bitfinex websocket closed with code {code} and reason {reason}, reconnecting in 10 seconds', ['code' => $code, 'reason' => $reason]);
 				foreach ($this->subscribers as $subscriber) {
 					$subscriber->onWebsocketClosed();
 				}
-				$this->loop->addTimer(10, function() {
-					$this->connect();
-				});
+				$this->connection = null;
+				if ($this->closeDeferred !== null) {
+					$this->closeDeferred->resolve();
+					$this->closeDeferred = null;
+				} else {
+					$this->reconnectTimer = $this->loop->addTimer(10, function() {
+						$this->reconnectTimer = null;
+						$this->connect();
+					});
+				}
 			});
 
 			$this->logger->debug('Connecting to Bitfinex websocket');
@@ -153,13 +168,30 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 		});
 	}
 
+	public function close(): PromiseInterface {
+		if ($this->reconnectTimer !== null) {
+			$this->reconnectTimer->cancel();
+			$this->reconnectTimer = null;
+		}
+		if (!$this->isRunning()) {
+			return \React\Promise\resolve();
+		}
+		if ($this->closeDeferred === null) {
+			$this->closeDeferred = new Deferred();
+			$promise = $this->closeDeferred->promise();
+			$this->connection->close();
+			return $promise;
+		}
+		return $this->closeDeferred->promise();
+	}
+
 	protected function isAuthChannelRequired(): bool {
-	    foreach ($this->subscribers as $subscriber) {
-	    	if ($subscriber->isAuthenticatedChannelRequired()) {
-	    		return true;
-		    }
-	    }
-	    return false;
+		foreach ($this->subscribers as $subscriber) {
+			if ($subscriber->isAuthenticatedChannelRequired()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	protected function getAuthentication(): array {
@@ -181,6 +213,10 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 	protected function getNonce(): string {
 		$microTime = explode(' ', microtime());
 		return $microTime[1] . substr($microTime[0], 2, 6);
+	}
+
+	protected function isRunning(): bool {
+		return $this->connection !== null;
 	}
 
 }
