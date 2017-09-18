@@ -10,6 +10,7 @@ use BitOasis\Bitfinex\Websocket\Channel\BitfinexPublicChannel;
 use Nette\Utils\Json;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
+use Psr\Log\NullLogger;
 use Ratchet\Client\WebSocket;
 use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
@@ -53,6 +54,7 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 		$this->frequency = $frequency;
 		$this->length = $length;
 		$this->hb = new HeartBeat([$this, 'onHeartBeatFailure'], [$this, 'onHeartBeatResumed'], $loop);
+		$this->logger = new NullLogger();
 	}
 
 	public function addOrderBookChannelSubscriber(OrderBookChannelSubscriber $subscriber) {

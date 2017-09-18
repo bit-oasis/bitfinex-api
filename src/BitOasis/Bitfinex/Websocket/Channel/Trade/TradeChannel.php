@@ -3,6 +3,7 @@
 namespace BitOasis\Bitfinex\Websocket\Channel\Trade;
 
 use BitOasis\Bitfinex\Websocket\HeartBeat;
+use Psr\Log\NullLogger;
 use React\Promise\Deferred;
 use React\Promise\Promise;
 use React\EventLoop\LoopInterface;
@@ -39,6 +40,7 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 	public function __construct(string $symbol, LoopInterface $loop) {
 		parent::__construct($symbol);
 		$this->hb = new HeartBeat([$this, 'onHeartBeatFailure'], [$this, 'onHeartBeatResumed'], $loop);
+		$this->logger = new NullLogger();
 	}
 
 
