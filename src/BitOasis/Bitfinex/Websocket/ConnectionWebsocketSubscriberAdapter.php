@@ -12,7 +12,7 @@ class ConnectionWebsocketSubscriberAdapter implements BitfinexWebsocketSubscribe
 	/** @var WebSocket */
 	protected $connection;
 
-	public function isAuthenticatedChannelRequired() {
+	public function isAuthenticatedChannelRequired(): bool {
 		return false;
 	}
 
@@ -39,7 +39,7 @@ class ConnectionWebsocketSubscriberAdapter implements BitfinexWebsocketSubscribe
 	public function onWebsocketErrorMessage($data) {
 	}
 
-	protected function isWebsocketConnected() {
+	protected function isWebsocketConnected(): bool {
 	    return $this->connection !== null;
 	}
 

@@ -1,41 +1,30 @@
 <?php
 
-namespace BitOasis\Bitfinex\Websocket\Channel\OrderBook;
+namespace BitOasis\Bitfinex\Websocket\Channel\Trade;
 
-use BitOasis\Bitfinex\Constant\Frequency;
-use BitOasis\Bitfinex\Constant\Precision;
-use BitOasis\Bitfinex\Exception\SubscriptionFailedException;
 use BitOasis\Bitfinex\Websocket\HeartBeat;
-use BitOasis\Bitfinex\Websocket\Channel\BitfinexPublicChannel;
-use Nette\Utils\Json;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Ratchet\Client\WebSocket;
-use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
 use React\Promise\Promise;
+use React\EventLoop\LoopInterface;
+use Ratchet\Client\WebSocket;
+use Nette\Utils\Json;
+use BitOasis\Bitfinex\Websocket\Channel\BitfinexPublicChannel;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use BitOasis\Bitfinex\Exception\SubscriptionFailedException;
 
 /**
- * @author Daniel Robenek <daniel.robenek@me.com>
+ * @author David Fiedor <davefu@seznam.cz>
  */
-class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInterface {
+class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface {
 	use LoggerAwareTrait;
 	
-	const CHANNEL_NAME = 'book';
-
-	/** @var string */
-	protected $precision;
-
-	/** @var string */
-	protected $frequency;
-
-	/** @var int */
-	protected $length;
+	const CHANNEL_NAME = 'trades';
 
 	/** @var HeartBeat */
 	protected $hb = null;
 
-	/** @var OrderBookChannelSubscriber[] */
+	/** @var TradeChannelSubscriber[] */
 	protected $subscribers = [];
 
 	/** @var Deferred[] */
@@ -47,15 +36,13 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 	/** @var bool */
 	protected $lastStatusSentWasStarted = false;
 
-	public function __construct(string $symbol, string $precision = Precision::P0, string $frequency = Frequency::F0, int $length = 100, LoopInterface $loop) {
+	public function __construct(string $symbol, LoopInterface $loop) {
 		parent::__construct($symbol);
-		$this->precision = $precision;
-		$this->frequency = $frequency;
-		$this->length = $length;
 		$this->hb = new HeartBeat([$this, 'onHeartBeatFailure'], [$this, 'onHeartBeatResumed'], $loop);
 	}
 
-	public function addOrderBookChannelSubscriber(OrderBookChannelSubscriber $subscriber) {
+
+	public function addTradeChannelSubscriber(TradeChannelSubscriber $subscriber) {
 	    $this->subscribers[] = $subscriber;
 	}
 
@@ -75,18 +62,18 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 			if ($data[1] === 'hb') {
 				return;
 			}
-			$update = $data[1];
+			$update = in_array($data[1], ['te', 'tu'], true) ? $data[2] : $data[1];
 			if (count($update) === 0 || is_array($update[0])) {
 				foreach ($update as $item) {
-					$message = new OrderBookMessage($item[0], $item[1], $item[2]);
+					$message = new TradeMessage($item[0], $item[1], $item[2], $item[3]);
 					foreach ($this->subscribers as $subscriber) {
-						$subscriber->onOrderBookUpdateReceived($message);
+						$subscriber->onTradeUpdateReceived($message);
 					}
 				}
 			} else {
-				$message = new OrderBookMessage($update[0], $update[1], $update[2]);
+				$message = new TradeMessage($update[0], $update[1], $update[2], $update[3]);
 				foreach ($this->subscribers as $subscriber) {
-					$subscriber->onOrderBookUpdateReceived($message);
+					$subscriber->onTradeUpdateReceived($message);
 				}
 			}
 		}
@@ -105,24 +92,22 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 
 	public function onHeartBeatFailure($channelId) {
 		$this->logger->warning('Heartbeat failure');
-		$this->fireOnOrderBookStopped();
+		$this->fireOnTradeStopped();
 	}
 
 	public function onHeartBeatResumed($channelId) {
-		$this->fireOnOrderBookStarted();
+		$this->fireOnTradeStarted();
 	}
 
 	protected function areChannelDataValid($data): bool {
-		if (isset($data['channel'], $data['symbol'], $data['prec'], $data['freq'], $data['len'])) {
-			if ($data['channel'] === self::CHANNEL_NAME && $data['symbol'] === $this->symbol && $data['prec'] === $this->precision && $data['freq'] === $this->frequency && (int)$data['len'] === $this->length) {
-				return true;
-			}
+		if (isset($data['channel'], $data['symbol']) && $data['channel'] === self::CHANNEL_NAME && $data['symbol'] === $this->symbol) {
+			return true;
 		}
 	    return false;
 	}
 
 	public function onMaintenanceStarted() {
-		$this->fireOnOrderBookStopped();
+		$this->fireOnTradeStopped();
 	}
 
 	public function onWebsocketChannelSubscribed($data) {
@@ -134,10 +119,7 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 
 			$this->channelId = $data['chanId'];
 			$this->hb->addChannel($this->channelId);
-			foreach ($this->subscribers as $subscriber) {
-				$subscriber->clearOrderBook();
-			}
-			$this->fireOnOrderBookStarted();
+			$this->fireOnTradeStarted();
 		}
 	}
 
@@ -162,9 +144,6 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 				'event' => 'subscribe',
 				'channel' => self::CHANNEL_NAME,
 				'symbol' => $this->symbol,
-				'prec' => $this->precision,
-				'freq' => $this->frequency,
-				'len' => $this->length,
 			]));
 		}
 		$this->subscribeDeferred[] = $deferred;
@@ -186,25 +165,25 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 	protected function removeStoppedChannelData() {
 		if ($this->channelId !== null) {
 			$this->hb->removeChannel($this->channelId);
-			$this->fireOnOrderBookStopped();
+			$this->fireOnTradeStopped();
 		}
 		$this->channelId = null;
 	}
 
-	protected function fireOnOrderBookStarted() {
+	protected function fireOnTradeStarted() {
 		if (!$this->lastStatusSentWasStarted) {
 			$this->lastStatusSentWasStarted = true;
 			foreach ($this->subscribers as $subscriber) {
-				$subscriber->onOrderBookStarted();
+				$subscriber->onTradeStarted();
 			}
 		}
 	}
 
-	protected function fireOnOrderBookStopped() {
+	protected function fireOnTradeStopped() {
 		if ($this->lastStatusSentWasStarted) {
 			$this->lastStatusSentWasStarted = false;
 			foreach ($this->subscribers as $subscriber) {
-				$subscriber->onOrderBookStopped();
+				$subscriber->onTradeStopped();
 			}
 		}
 	}

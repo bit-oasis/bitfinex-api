@@ -9,7 +9,7 @@ use Ratchet\Client\WebSocket;
  */
 interface BitfinexWebsocketSubscriber {
 
-	public function isAuthenticatedChannelRequired();
+	public function isAuthenticatedChannelRequired(): bool;
 
 	public function onWebsocketConnected(WebSocket $conn, $version);
 
