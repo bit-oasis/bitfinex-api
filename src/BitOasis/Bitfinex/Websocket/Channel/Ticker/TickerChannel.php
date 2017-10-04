@@ -2,8 +2,11 @@
 
 namespace BitOasis\Bitfinex\Websocket\Channel\Ticker;
 
+use BitOasis\Bitfinex\Exception\SubscriptionFailedException;
 use BitOasis\Bitfinex\Websocket\HeartBeat;
+use Nette\Utils\Json;
 use Psr\Log\NullLogger;
+use Ratchet\Client\WebSocket;
 use React\Promise\Deferred;
 use React\Promise\Promise;
 use React\EventLoop\LoopInterface;
@@ -64,7 +67,7 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 			$update = $data[1];
 			$message = new TickerMessage($update[0], $update[2], $update[4], ($update[5] * 100), $update[6], $update[8], $update[9]);
 			foreach ($this->subscribers as $subscriber) {
-				$subscriber->onTradeUpdateReceived($message);
+				$subscriber->onTickerUpdateReceived($message);
 			}
 		}
 	}

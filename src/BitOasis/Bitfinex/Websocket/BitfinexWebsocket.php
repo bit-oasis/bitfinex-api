@@ -15,7 +15,6 @@ use Ratchet\RFC6455\Messaging\MessageInterface;
 use React\EventLoop\LoopInterface;
 use React\EventLoop\Timer\TimerInterface;
 use React\Promise\Deferred;
-use React\Promise\Promise;
 use React\Promise\PromiseInterface;
 
 /**
