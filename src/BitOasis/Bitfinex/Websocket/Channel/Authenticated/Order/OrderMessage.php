@@ -1,11 +1,13 @@
 <?php
 
-namespace BitOasis\Bitfinex;
+namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated\Order;
+
+use BitOasis\Bitfinex\Utils\DateTimeUtils;
 
 /**
  * @author Daniel Robenek <daniel.robenek@me.com>
  */
-class OrderStatus {
+class OrderMessage {
 
 	/** @var int */
 	protected $id;
@@ -19,11 +21,11 @@ class OrderStatus {
 	/** @var string */
 	protected $symbol;
 
-	/** @var \DateTime */
-	protected $dateCreated;
+	/** @var int in milliseconds */
+	protected $timestampCreated;
 
-	/** @var \DateTime */
-	protected $dateUpdated;
+	/** @var int in milliseconds */
+	protected $timestampUpdated;
 
 	/** @var float */
 	protected $amount;
@@ -61,13 +63,13 @@ class OrderStatus {
 	/** @var int */
 	protected $placedId;
 
-	public function __construct(int $id, int $gid, int $cid, string $symbol, \DateTime $dateCreated, \DateTime $dateUpdated, float $amount, float $originalAmount, string $type, string $previousType, string $orderStatus, float $price, float $avgPrice, float $trailingPrice, float $auxLimitPrice, bool $notify, bool $hidden, int $placedId) {
+	public function __construct(int $id, int $gid, int $cid, string $symbol, int $timestampCreated, int $timestampUpdated, float $amount, float $originalAmount, string $type, string $previousType, string $orderStatus, float $price, float $avgPrice, float $trailingPrice, float $auxLimitPrice, bool $notify, bool $hidden, int $placedId) {
 		$this->id = $id;
 		$this->gid = $gid;
 		$this->cid = $cid;
 		$this->symbol = $symbol;
-		$this->dateCreated = $dateCreated;
-		$this->dateUpdated = $dateUpdated;
+		$this->timestampCreated = $timestampCreated;
+		$this->timestampUpdated = $timestampUpdated;
 		$this->amount = $amount;
 		$this->originalAmount = $originalAmount;
 		$this->type = $type;
@@ -82,7 +84,11 @@ class OrderStatus {
 		$this->placedId = $placedId;
 	}
 
-
+	/**
+	 * @param array $data
+	 * @return \static
+	 * @link https://bitfinex.readme.io/v2/reference#ws-auth-orders
+	 */
 	public static function fromWebsocketData(array $data) {
 		return new static(
 			$data[0],
@@ -135,17 +141,31 @@ class OrderStatus {
 	}
 
 	/**
+	 * @return int in milliseconds
+	 */
+	public function getTimestampCreated(): int {
+		return $this->timestampCreated;
+	}
+
+	/**
 	 * @return \DateTime
 	 */
 	public function getDateCreated(): \DateTime {
-		return $this->dateCreated;
+		return DateTimeUtils::createDateTimeFromTimestamp($this->timestampCreated);
+	}
+
+	/**
+	 * @return int in milliseconds
+	 */
+	public function getTimestampUpdated(): int {
+		return $this->timestampUpdated;
 	}
 
 	/**
 	 * @return \DateTime
 	 */
 	public function getDateUpdated(): \DateTime {
-		return $this->dateUpdated;
+		return DateTimeUtils::createDateTimeFromTimestamp($this->timestampUpdated);
 	}
 
 	/**
