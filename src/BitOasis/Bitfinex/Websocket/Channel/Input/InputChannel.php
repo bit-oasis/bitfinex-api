@@ -5,33 +5,16 @@ namespace BitOasis\Bitfinex\Websocket\Channel\Input;
 use BitOasis\Bitfinex\Exception\NotConnectedException;
 use BitOasis\Bitfinex\Exception\OperationFailedException;
 use BitOasis\Bitfinex\Websocket\Channel\Input\Operation\Operation;
-use BitOasis\Bitfinex\Websocket\ConnectionWebsocketSubscriberAdapter;
+use BitOasis\Bitfinex\Websocket\Channel\BitfinexAuthenticatedSubchannel;
 use Nette\Utils\Json;
-use Ratchet\Client\WebSocket;
 use React\Promise\Promise;
 
 /**
  * @author Daniel Robenek <daniel.robenek@me.com>
  */
-class InputChannel extends ConnectionWebsocketSubscriberAdapter {
+class InputChannel extends BitfinexAuthenticatedSubchannel {
 
 	protected $operationsByReplyCode = [];
-
-	/** @var bool */
-	protected $authenticated = false;
-
-	public function isAuthenticatedChannelRequired() {
-		return true;
-	}
-
-	public function onWebsocketAuthenticated() {
-		$this->authenticated = true;
-		$this->connection->send(Json::encode([0,'os']));
-	}
-
-	public function onWebsocketClosed() {
-		$this->authenticated = false;
-	}
 
 	public function onWebsocketMessageReceived($data) {
 		if ($data[0] === 0 && $data[1] === 'n' && isset($this->operationsByReplyCode[$data[2][1]])) {
@@ -48,15 +31,6 @@ class InputChannel extends ConnectionWebsocketSubscriberAdapter {
 				}
 			}
 		}
-	}
-
-	public function onWebsocketErrorMessage($data) {
-	}
-
-	public function onMaintenanceStarted() {
-	}
-
-	public function onMaintenanceEnded(WebSocket $conn) {
 	}
 
 	public function process(Operation $operation): Promise {
