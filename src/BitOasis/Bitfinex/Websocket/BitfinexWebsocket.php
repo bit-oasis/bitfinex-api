@@ -5,6 +5,7 @@ namespace BitOasis\Bitfinex\Websocket;
 use BitOasis\Bitfinex\Exception\AuthenticationFailedException;
 use BitOasis\Bitfinex\Exception\CannotAddSubscriberException;
 use BitOasis\Bitfinex\Websocket\Channel\Authenticated\AuthenticatedChannel;
+use BitOasis\Bitfinex\Websocket\Channel\Authenticated\AuthenticatedSubchannel;
 use Nette\Utils\Json;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
@@ -61,7 +62,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 		if ($this->isRunning()) {
 			throw new CannotAddSubscriberException("Can't add subscriber when websocket is connected and running!");
 		}
-		if ($subscriber->isAuthenticatedChannelRequired()) {
+		if ($subscriber->isAuthenticatedChannelRequired() && $subscriber instanceof AuthenticatedSubchannel) {
 			$this->authChannel->addSubchannel($subscriber);
 		} else {
 			$this->subscribers[] = $subscriber;
