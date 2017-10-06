@@ -1,8 +1,8 @@
 <?php
 
-namespace BitOasis\Bitfinex\Websocket\Channel\Input;
+namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input;
 
-use BitOasis\Bitfinex\Websocket\Channel\Input\Operation\Operation;
+use BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\Operation\Operation;
 use React\Promise\Deferred;
 use React\Promise\Promise;
 

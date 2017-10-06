@@ -1,6 +1,6 @@
 <?php
 
-namespace BitOasis\Bitfinex\Websocket\Channel;
+namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated;
 
 use BitOasis\Bitfinex\Websocket\ConnectionWebsocketSubscriberAdapter;
 

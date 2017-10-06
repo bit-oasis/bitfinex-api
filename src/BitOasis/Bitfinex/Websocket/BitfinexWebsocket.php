@@ -4,7 +4,7 @@ namespace BitOasis\Bitfinex\Websocket;
 
 use BitOasis\Bitfinex\Exception\AuthenticationFailedException;
 use BitOasis\Bitfinex\Exception\CannotAddSubscriberException;
-use BitOasis\Bitfinex\Websocket\Channel\AuthenticatedChannel;
+use BitOasis\Bitfinex\Websocket\Channel\Authenticated\AuthenticatedChannel;
 use Nette\Utils\Json;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;

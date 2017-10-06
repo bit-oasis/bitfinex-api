@@ -205,18 +205,18 @@ $orderBookChannel->addOrderBookChannelSubscriber($x);
 //$websocket->addSubscriber($orderBookChannel);
 
 
-$inputChannel = new \BitOasis\Bitfinex\Websocket\Channel\Input\InputChannel();
+$inputChannel = new \BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\InputChannel();
 $websocket->addSubscriber($inputChannel);
 
 $loop->addTimer(5, function() use($inputChannel) {
-	$cancelOrder = \BitOasis\Bitfinex\Websocket\Channel\Input\Operation\CancelOrder::fromCid(28804, new DateTime());
+	$cancelOrder = \BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\Operation\CancelOrder::fromCid(28804, new DateTime());
 	$inputChannel->process($cancelOrder)->done(function($a) {
 		echo("\nOK\n");
 	}, function($x) {
 		print_r($x);
 		echo("\nFAIL\n");
 	});
-//	$newOrder = new \BitOasis\Bitfinex\Websocket\Channel\Input\Operation\NewOrder(rand(10, 100000), \BitOasis\Bitfinex\Constant\OrderType::EXCHANGE_LIMIT, \BitOasis\Bitfinex\Constant\Symbol::TBTCUSD, 0.005, rand(10,100));
+	$newOrder = new \BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\Operation\NewOrder(rand(10, 100000), \BitOasis\Bitfinex\Constant\OrderType::EXCHANGE_LIMIT, \BitOasis\Bitfinex\Constant\Symbol::TBTCUSD, 0.005, rand(10,100));
 //	$newOrder->setGid(1);
 //	$inputChannel->process($newOrder)->done(function($a) {
 //		print_r($a);

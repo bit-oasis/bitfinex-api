@@ -1,11 +1,11 @@
 <?php
 
-namespace BitOasis\Bitfinex\Websocket\Channel\Input;
+namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input;
 
 use BitOasis\Bitfinex\Exception\NotConnectedException;
 use BitOasis\Bitfinex\Exception\OperationFailedException;
-use BitOasis\Bitfinex\Websocket\Channel\Input\Operation\Operation;
-use BitOasis\Bitfinex\Websocket\Channel\BitfinexAuthenticatedSubchannel;
+use BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\Operation\Operation;
+use BitOasis\Bitfinex\Websocket\Channel\Authenticated\BitfinexAuthenticatedSubchannel;
 use Nette\Utils\Json;
 use React\Promise\Promise;
 

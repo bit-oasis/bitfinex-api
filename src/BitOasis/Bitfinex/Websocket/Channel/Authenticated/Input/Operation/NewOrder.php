@@ -1,6 +1,6 @@
 <?php
 
-namespace BitOasis\Bitfinex\Websocket\Channel\Input\Operation;
+namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\Operation;
 
 use BitOasis\Bitfinex\Exception\OperationFailedException;
 
