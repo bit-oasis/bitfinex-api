@@ -2,6 +2,7 @@
 
 namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\Operation;
 
+use BitOasis\Bitfinex\Utils\ClientOrderIdUtils;
 use BitOasis\Bitfinex\Exception\OperationFailedException;
 
 /**
@@ -43,7 +44,7 @@ class CancelOrder implements Operation {
 		if ($this->id !== null) {
 			return ['id' => $this->id];
 		}
-		return ['cid' => $this->cid, 'cid_date' => $this->cidDate->format('Y-m-d')];
+		return ['cid' => $this->cid, 'cid_date' => ClientOrderIdUtils::createCidDate($this->cidDate)];
 	}
 
 	public function getOperationNotificationCode(): string {
@@ -54,7 +55,7 @@ class CancelOrder implements Operation {
 		if ($this->id !== null) {
 			return $data[4][0] === $this->id;
 		}
-		return $data[4][2] === $this->cid; // todo: cid date
+		return ClientOrderIdUtils::compareCids($data[4][2], $data[4][4], $this->cid, $this->cidDate);
 	}
 
 	public function createResponse(array $data) {
