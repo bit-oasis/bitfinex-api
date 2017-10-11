@@ -74,7 +74,7 @@ class TradeMessage {
 			$data[5],
 			$data[6],
 			$data[7],
-			$data[8] === 1 ? true : false,
+			$data[8] === 1,
 			$data[9],
 			$data[10]
 		);

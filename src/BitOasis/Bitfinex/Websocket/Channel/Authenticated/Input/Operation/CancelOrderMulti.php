@@ -67,8 +67,7 @@ class CancelOrderMulti implements Operation {
 			if (count($item) < 2) {
 				throw new InvalidArgumentException("Missing 'cid' and/or 'cidDate' values in array on $key index!");
 			}
-			$cId = $item[0];
-			$cIdDate = $item[1];
+			list ($cId, $cIdDate) = $item;
 			if (!is_numeric($cId)) {
 				throw new InvalidArgumentException("'{$cId}' is not valid cid on $key index!");
 			}
@@ -88,7 +87,7 @@ class CancelOrderMulti implements Operation {
 	public function getOperationData(): array {
 		if (!empty($this->ids)) {
 			$name = 'id';
-			$mappedItems = array_values($this->id);
+			$mappedItems = array_values($this->ids);
 		} else {
 			$name = 'cid';
 			$mappedItems = array_map(function($item) {

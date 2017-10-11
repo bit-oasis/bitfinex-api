@@ -62,7 +62,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 		if ($this->isRunning()) {
 			throw new CannotAddSubscriberException("Can't add subscriber when websocket is connected and running!");
 		}
-		if ($subscriber->isAuthenticatedChannelRequired() && $subscriber instanceof AuthenticatedSubchannel) {
+		if ($subscriber instanceof AuthenticatedSubchannel && $subscriber->isAuthenticatedChannelRequired()) {
 			$this->authChannel->addSubchannel($subscriber);
 		} else {
 			$this->subscribers[] = $subscriber;
@@ -85,7 +85,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 			$conn->on('message', function(MessageInterface $msg) use($conn) {
 				$data = Json::decode($msg, JSON_OBJECT_AS_ARRAY);
 				$this->logger->debug('Bitfinex message received: {message}', ['message' => $data]);
-				$event = isset($data['event']) ? $data['event'] : null;
+				$event = isset($data['event']) ?? null;
 				if($event === null) {
 					foreach ($this->subscribers as $subscriber) {
 						$subscriber->onWebsocketMessageReceived($data);

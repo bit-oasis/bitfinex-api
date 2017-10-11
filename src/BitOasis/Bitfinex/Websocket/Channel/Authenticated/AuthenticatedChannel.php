@@ -4,7 +4,6 @@ namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated;
 
 use BitOasis\Bitfinex\Websocket\HeartBeat;
 use Ratchet\Client\WebSocket;
-use BitOasis\Bitfinex\Websocket\BitfinexWebsocketSubscriber;
 use React\Promise;
 use React\Promise\Deferred;
 use React\Promise\ExtendedPromiseInterface;
@@ -33,9 +32,9 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 	protected $apiSecret;
 
 	/** @var HeartBeat */
-	protected $hb = null;
+	protected $hb;
 
-	/** @var BitfinexWebsocketSubscriber[] */
+	/** @var AuthenticatedSubchannel[] */
 	protected $subchannels = [];
 
 	/** @var bool */
@@ -108,7 +107,7 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 	}
 
 	public function onWebsocketChannelUnsubscribed($data) {
-		if ($data['chanId'] === self::CHANNEL_ID && !empty($this->unsubscribeDeferred)) {
+		if (!empty($this->unsubscribeDeferred) && $data['chanId'] === self::CHANNEL_ID) {
 			if ($data['status'] === 'OK') {
 				foreach ($this->unsubscribeDeferred as $deferred) {
 					$deferred->resolve();

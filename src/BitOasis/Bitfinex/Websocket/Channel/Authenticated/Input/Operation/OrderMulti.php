@@ -10,7 +10,7 @@ use BitOasis\Bitfinex\Exception\OperationFailedException;
  */
 class OrderMulti implements MultiOperation {
 
-	/** @var Operation[] */
+	/** @var Operation[][] */
 	protected $operationsByReplyCode = [];
 
 	/** @var int */
@@ -53,13 +53,14 @@ class OrderMulti implements MultiOperation {
 			}
 			$this->operationsByReplyCode[$code][] = $operation;
 		}
-		$this->operationsCount = count($operation);
+		$this->operationsCount = count($operations);
 	}
 
 	/**
 	 * Operation will be resolved only when all operations are resolved, otherwise it will be rejected
 	 * @param Operation[] $operations
 	 * @return \static
+	 * @throws InvalidArgumentException
 	 */
 	public static function resolveAll(array $operations) {
 		return new static($operations,  self::RESOLVE_TYPE_ALL);
@@ -69,6 +70,7 @@ class OrderMulti implements MultiOperation {
 	 * Operation will be resolved if at least one operation is resolved
 	 * @param Operation[] $operations
 	 * @return \static
+	 * @throws InvalidArgumentException
 	 */
 	public static function resolveAny(array $operations) {
 		return new static($operations,  self::RESOLVE_TYPE_ANY);
@@ -93,7 +95,7 @@ class OrderMulti implements MultiOperation {
 	}
 
 	public function isCompleting(array $data): bool {
-		if ($this->hasMainErrorOccured($data)) {
+		if ($this->hasMainErrorOccurred($data)) {
 			return true;
 		}
 		$code = $data[4][2];
@@ -119,7 +121,7 @@ class OrderMulti implements MultiOperation {
 	}
 
 	public function createResponse(array $data) {
-		if ($this->hasMainErrorOccured($data)) {
+		if ($this->hasMainErrorOccurred($data)) {
 			throw new OperationFailedException($data[6] . ': ' . $data[7]);
 		}
 		if (!$this->isCompleted()) {
@@ -137,7 +139,7 @@ class OrderMulti implements MultiOperation {
 		throw reset($this->errors);
 	}
 
-	protected function hasMainErrorOccured(array $data) {
+	protected function hasMainErrorOccurred(array $data) {
 		return $data[1] === $this->getOperationNotificationCode() && $data[6] === 'ERROR';
 	}
 

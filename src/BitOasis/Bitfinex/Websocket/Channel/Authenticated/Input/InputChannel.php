@@ -30,7 +30,7 @@ class InputChannel extends BitfinexAuthenticatedSubchannel {
 
 	public function process(Operation $operation): Promise {
 		if (!$this->authenticated) {
-			throw new NotConnectedException();
+			throw new NotConnectedException("Can't process order when channel is not authenticated!");
 		}
 		$json = Json::encode([
 			0,

@@ -40,6 +40,8 @@ abstract class BitfinexPublicChannel extends ConnectionWebsocketSubscriberAdapte
 		});
 	}
 
-	protected abstract function subscribe(WebSocket $conn): Promise;
-	protected abstract function unsubscribe(WebSocket $conn): Promise;
+	abstract protected function subscribe(WebSocket $conn): Promise;
+
+	abstract protected function unsubscribe(WebSocket $conn): Promise;
+
 }
