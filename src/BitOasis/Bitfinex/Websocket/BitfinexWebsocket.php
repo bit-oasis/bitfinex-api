@@ -4,8 +4,9 @@ namespace BitOasis\Bitfinex\Websocket;
 
 use BitOasis\Bitfinex\Exception\AuthenticationFailedException;
 use BitOasis\Bitfinex\Exception\CannotAddSubscriberException;
+use BitOasis\Bitfinex\Websocket\Channel\Authenticated\AuthenticatedChannel;
+use BitOasis\Bitfinex\Websocket\Channel\Authenticated\AuthenticatedSubchannel;
 use Nette\Utils\Json;
-use Nette\Utils\Strings;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -25,14 +26,11 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 
 	const WEBSOCKET_URL = 'wss://api.bitfinex.com/ws/2';
 
+	/** @var AuthenticatedChannel */
+	protected $authChannel;
+
 	/** @var BitfinexWebsocketSubscriber[] */
 	protected $subscribers = [];
-
-	/** @var string */
-	protected $apiKey;
-
-	/** @var string */
-	protected $apiSecret;
 
 	/** @var LoopInterface */
 	protected $loop;
@@ -50,8 +48,8 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 	protected $reconnectTimer;
 
 	public function __construct(string $apiKey = null, string $apiSecret = null, LoopInterface $loop) {
-		$this->apiKey = $apiKey;
-		$this->apiSecret = $apiSecret;
+		$this->authChannel = new AuthenticatedChannel($apiKey, $apiSecret, $loop);
+		$this->subscribers[] = $this->authChannel;
 		$this->loop = $loop;
 		$this->logger = new NullLogger();
 	}
@@ -64,7 +62,11 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 		if ($this->isRunning()) {
 			throw new CannotAddSubscriberException("Can't add subscriber when websocket is connected and running!");
 		}
-		$this->subscribers[] = $subscriber;
+		if ($subscriber instanceof AuthenticatedSubchannel && $subscriber->isAuthenticatedChannelRequired()) {
+			$this->authChannel->addSubchannel($subscriber);
+		} else {
+			$this->subscribers[] = $subscriber;
+		}
 		$this->logger->debug('New subscriber {subscriber}', ['subscriber' => $subscriber]);
 	}
 
@@ -83,7 +85,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 			$conn->on('message', function(MessageInterface $msg) use($conn) {
 				$data = Json::decode($msg, JSON_OBJECT_AS_ARRAY);
 				$this->logger->debug('Bitfinex message received: {message}', ['message' => $data]);
-				$event = isset($data['event']) ? $data['event'] : null;
+				$event = $data['event'] ?? null;
 				if($event === null) {
 					foreach ($this->subscribers as $subscriber) {
 						$subscriber->onWebsocketMessageReceived($data);
@@ -117,10 +119,6 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 						$this->logger->info('Websocket connected to API version {version}', ['version' => $data['version']]);
 						foreach ($this->subscribers as $subscriber) {
 							$subscriber->onWebsocketConnected($conn, $data['version']);
-						}
-						if ($this->isAuthChannelRequired()) {
-							$this->logger->debug('Authentication requested');
-							$conn->send(Json::encode($this->getAuthentication()));
 						}
 					} else if (isset($data['code'])) {
 						if ($data['code'] === 20060) { // 20060 : Entering in Maintenance mode. Please pause any activity and resume after receiving the info message 20061 (it should take 120 seconds at most).
@@ -182,36 +180,6 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 			return $promise;
 		}
 		return $this->closeDeferred->promise();
-	}
-
-	protected function isAuthChannelRequired(): bool {
-		foreach ($this->subscribers as $subscriber) {
-			if ($subscriber->isAuthenticatedChannelRequired()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	protected function getAuthentication(): array {
-		$nonce = $this->getNonce();
-		$payload = 'AUTH' . $nonce;
-		return [
-			'event' => 'auth',
-			'apiKey' => $this->apiKey,
-			'authSig' => $this->getSignature($payload),
-			'authPayload' => $payload,
-			'authNonce' => $nonce,
-		];
-	}
-
-	protected function getSignature(string $payload): string {
-		return Strings::lower(hash_hmac('sha384', $payload, $this->apiSecret));
-	}
-
-	protected function getNonce(): string {
-		$microTime = explode(' ', microtime());
-		return $microTime[1] . substr($microTime[0], 2, 6);
 	}
 
 	protected function isRunning(): bool {

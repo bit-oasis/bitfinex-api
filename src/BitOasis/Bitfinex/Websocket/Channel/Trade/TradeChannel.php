@@ -23,7 +23,7 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 	const CHANNEL_NAME = 'trades';
 
 	/** @var HeartBeat */
-	protected $hb = null;
+	protected $hb;
 
 	/** @var TradeChannelSubscriber[] */
 	protected $subscribers = [];
@@ -102,10 +102,7 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 	}
 
 	protected function areChannelDataValid($data): bool {
-		if (isset($data['channel'], $data['symbol']) && $data['channel'] === self::CHANNEL_NAME && $data['symbol'] === $this->symbol) {
-			return true;
-		}
-	    return false;
+		return isset($data['channel'], $data['symbol']) && $data['channel'] === self::CHANNEL_NAME && $data['symbol'] === $this->symbol;
 	}
 
 	public function onMaintenanceStarted() {

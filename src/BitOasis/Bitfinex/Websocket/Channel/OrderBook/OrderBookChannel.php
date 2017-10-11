@@ -34,7 +34,7 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 	protected $length;
 
 	/** @var HeartBeat */
-	protected $hb = null;
+	protected $hb;
 
 	/** @var OrderBookChannelSubscriber[] */
 	protected $subscribers = [];
@@ -115,12 +115,9 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 	}
 
 	protected function areChannelDataValid($data): bool {
-		if (isset($data['channel'], $data['symbol'], $data['prec'], $data['freq'], $data['len'])) {
-			if ($data['channel'] === self::CHANNEL_NAME && $data['symbol'] === $this->symbol && $data['prec'] === $this->precision && $data['freq'] === $this->frequency && (int)$data['len'] === $this->length) {
-				return true;
-			}
-		}
-	    return false;
+		return isset($data['channel'], $data['symbol'], $data['prec'], $data['freq'], $data['len'])
+			&& $data['channel'] === self::CHANNEL_NAME && $data['symbol'] === $this->symbol && $data['prec'] === $this->precision
+			&& $data['freq'] === $this->frequency && (int)$data['len'] === $this->length;
 	}
 
 	public function onMaintenanceStarted() {

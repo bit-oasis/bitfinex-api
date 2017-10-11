@@ -23,7 +23,7 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 	const CHANNEL_NAME = 'ticker';
 
 	/** @var HeartBeat */
-	protected $hb = null;
+	protected $hb;
 
 	/** @var TickerChannelSubscriber[] */
 	protected $subscribers = [];
@@ -65,7 +65,7 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 				return;
 			}
 			$update = $data[1];
-			$message = new TickerMessage($update[0], $update[2], $update[4], ($update[5] * 100), $update[6], $update[8], $update[9]);
+			$message = new TickerMessage($update[0], $update[2], $update[4], $update[5] * 100, $update[6], $update[8], $update[9]);
 			foreach ($this->subscribers as $subscriber) {
 				$subscriber->onTickerUpdateReceived($message);
 			}
@@ -93,10 +93,7 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 	}
 
 	protected function areChannelDataValid($data): bool {
-		if (isset($data['channel'], $data['symbol']) && $data['channel'] === self::CHANNEL_NAME && $data['symbol'] === $this->symbol) {
-			return true;
-		}
-	    return false;
+		return isset($data['channel'], $data['symbol']) && $data['channel'] === self::CHANNEL_NAME && $data['symbol'] === $this->symbol;
 	}
 
 	public function onMaintenanceStarted() {
