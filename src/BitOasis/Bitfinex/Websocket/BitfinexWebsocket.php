@@ -85,7 +85,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 			$conn->on('message', function(MessageInterface $msg) use($conn) {
 				$data = Json::decode($msg, JSON_OBJECT_AS_ARRAY);
 				$this->logger->debug('Bitfinex message received: {message}', ['message' => $data]);
-				$event = isset($data['event']) ?? null;
+				$event = $data['event'] ?? null;
 				if($event === null) {
 					foreach ($this->subscribers as $subscriber) {
 						$subscriber->onWebsocketMessageReceived($data);
