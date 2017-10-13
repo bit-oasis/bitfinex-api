@@ -2,12 +2,12 @@
 
 namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated\Trade;
 
-use BitOasis\Bitfinex\Websocket\Channel\Authenticated\BitfinexAuthenticatedSubchannel;
+use BitOasis\Bitfinex\Websocket\Channel\Authenticated\ConnectionAuthenticatedSubchannelAdapter;
 
 /**
  * @author David Fiedor <davefu@seznam.cz>
  */
-class TradeChannel extends BitfinexAuthenticatedSubchannel {
+class TradeChannel extends ConnectionAuthenticatedSubchannelAdapter {
 
 	/** @var TradeChannelSubscriber[] */
 	protected $subscribers = [];

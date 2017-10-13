@@ -6,14 +6,14 @@ use BitOasis\Bitfinex\Exception\NotConnectedException;
 use BitOasis\Bitfinex\Exception\OperationFailedException;
 use BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\Operation\Operation;
 use BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\Operation\MultiOperation;
-use BitOasis\Bitfinex\Websocket\Channel\Authenticated\BitfinexAuthenticatedSubchannel;
+use BitOasis\Bitfinex\Websocket\Channel\Authenticated\ConnectionAuthenticatedSubchannelAdapter;
 use Nette\Utils\Json;
 use React\Promise\Promise;
 
 /**
  * @author Daniel Robenek <daniel.robenek@me.com>
  */
-class InputChannel extends BitfinexAuthenticatedSubchannel {
+class InputChannel extends ConnectionAuthenticatedSubchannelAdapter {
 
 	protected $operationsByReplyCode = [];
 

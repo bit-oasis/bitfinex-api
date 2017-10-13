@@ -12,7 +12,7 @@ class OrderMessage {
 	/** @var int */
 	protected $id;
 
-	/** @var int */
+	/** @var int|null */
 	protected $gid;
 
 	/** @var int */
@@ -28,7 +28,7 @@ class OrderMessage {
 	protected $timestampUpdated;
 
 	/** @var float */
-	protected $amount;
+	protected $remainingAmount;
 
 	/** @var float */
 	protected $originalAmount;
@@ -63,14 +63,14 @@ class OrderMessage {
 	/** @var int */
 	protected $placedId;
 
-	public function __construct(int $id, int $gid, int $cid, string $symbol, int $timestampCreated, int $timestampUpdated, float $amount, float $originalAmount, string $type, string $previousType, string $orderStatus, float $price, float $avgPrice, float $trailingPrice, float $auxLimitPrice, bool $notify, bool $hidden, int $placedId) {
+	public function __construct(int $id, /*?int */$gid, int $cid, string $symbol, int $timestampCreated, int $timestampUpdated, float $remainingAmount, float $originalAmount, string $type, /*?string */$previousType, string $orderStatus, float $price, float $avgPrice, float $trailingPrice, float $auxLimitPrice, bool $notify, bool $hidden, int $placedId) {
 		$this->id = $id;
 		$this->gid = $gid;
 		$this->cid = $cid;
 		$this->symbol = $symbol;
 		$this->timestampCreated = $timestampCreated;
 		$this->timestampUpdated = $timestampUpdated;
-		$this->amount = $amount;
+		$this->remainingAmount = $remainingAmount;
 		$this->originalAmount = $originalAmount;
 		$this->type = $type;
 		$this->previousType = $previousType;
@@ -120,9 +120,9 @@ class OrderMessage {
 	}
 
 	/**
-	 * @return int
+	 * @return int|null
 	 */
-	public function getGid(): int {
+	public function getGid()/*: ?int*/ {
 		return $this->gid;
 	}
 
@@ -171,8 +171,8 @@ class OrderMessage {
 	/**
 	 * @return float
 	 */
-	public function getAmount(): float {
-		return $this->amount;
+	public function getRemainingAmount(): float {
+		return $this->remainingAmount;
 	}
 
 	/**
@@ -250,6 +250,34 @@ class OrderMessage {
 	 */
 	public function getPlacedId(): int {
 		return $this->placedId;
+	}
+
+	public function isStatusActive(): bool {
+		return 0 === strpos($this->orderStatus, 'ACTIVE');
+	}
+
+	public function isStatusCanceled(): bool {
+		return 0 === strpos($this->orderStatus, 'CANCELED');
+	}
+
+	public function isStatusExecuted(): bool {
+		return 0 === strpos($this->orderStatus, 'EXECUTED');
+	}
+
+	public function isStatusPartiallyFilled(): bool {
+		return 0 === strpos($this->orderStatus, 'PARTIALLY FILLED');
+	}
+
+	public function isStatusInsufficientMargin(): bool {
+		return 0 === strpos($this->orderStatus, 'INSUFFICIENT MARGIN');
+	}
+
+	public function isLive(): bool {
+	    return $this->isStatusActive() || $this->isStatusPartiallyFilled();
+	}
+
+	public function isCanceled(): bool {
+		return $this->isStatusCanceled() || $this->isStatusInsufficientMargin();
 	}
 
 }

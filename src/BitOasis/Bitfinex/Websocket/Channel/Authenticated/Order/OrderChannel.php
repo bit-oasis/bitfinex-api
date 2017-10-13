@@ -2,12 +2,12 @@
 
 namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated\Order;
 
-use BitOasis\Bitfinex\Websocket\Channel\Authenticated\BitfinexAuthenticatedSubchannel;
+use BitOasis\Bitfinex\Websocket\Channel\Authenticated\ConnectionAuthenticatedSubchannelAdapter;
 
 /**
  * @author David Fiedor <davefu@seznam.cz>
  */
-class OrderChannel extends BitfinexAuthenticatedSubchannel {
+class OrderChannel extends ConnectionAuthenticatedSubchannelAdapter {
 
 	/** @var OrderChannelSubscriber[] */
 	protected $subscribers = [];
@@ -20,14 +20,13 @@ class OrderChannel extends BitfinexAuthenticatedSubchannel {
 	}
 
 	public function onWebsocketMessageReceived($data) {
-		if (count($data) > 2 && $data[0] === 0 && in_array($data[1], ['os', 'on', 'ou', 'oc'], true)) {
-			$update = $data[2];
+		if (count($data) > 2 && $data[0] === 0) {
 			if ($data[1] === 'os') {
-				foreach ($update as $item) {
+				foreach ($data[2] as $item) {
 					$this->fireOnUpdateReceived(OrderMessage::fromWebsocketData($item));
 				}
-			} else {
-				$this->fireOnUpdateReceived(OrderMessage::fromWebsocketData($update));
+			} else if(in_array($data[1], ['on', 'ou', 'oc'], true)) {
+				$this->fireOnUpdateReceived(OrderMessage::fromWebsocketData($data[2]));
 			}
 		}
 	}
