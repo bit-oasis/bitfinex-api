@@ -2,6 +2,8 @@
 
 namespace BitOasis\Bitfinex\Websocket\Channel\Trade;
 
+use BitOasis\Bitfinex\Utils\DateTimeUtils;
+
 /**
  * @author David Fiedor <davefu@seznam.cz>
  */
@@ -42,6 +44,13 @@ class TradeMessage {
 	 */
 	public function getTimestamp(): int {
 		return $this->timestamp;
+	}
+
+	/**
+	 * @return \DateTime
+	 */
+	public function getDateTime(): \DateTime {
+		return DateTimeUtils::createDateTimeFromTimestamp($this->timestamp);
 	}
 
 	public function getAmount(): float {

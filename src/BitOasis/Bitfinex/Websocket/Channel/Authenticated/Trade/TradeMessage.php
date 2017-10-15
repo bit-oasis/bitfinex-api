@@ -2,6 +2,9 @@
 
 namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated\Trade;
 
+use BitOasis\Bitfinex\Utils\DateTimeUtils;
+
+
 /**
  * @author David Fiedor <davefu@seznam.cz>
  */
@@ -121,7 +124,7 @@ class TradeMessage {
 	public function getExecPrice(): float {
 		return $this->execPrice;
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -139,7 +142,7 @@ class TradeMessage {
 	/**
 	 * @return bool
 	 */
-	public function getIsMaker(): bool {
+	public function isMaker(): bool {
 		return $this->isMaker;
 	}
 
@@ -149,12 +152,47 @@ class TradeMessage {
 	public function getFee() {
 		return $this->fee;
 	}
-	
+
 	/**
 	 * @return string|null
 	 */
 	public function getFeeCurrency() {
 		return $this->feeCurrency;
+	}
+
+	/**
+	 * @return \DateTime
+	 */
+	public function getDateTime(): \DateTime {
+		return DateTimeUtils::createDateTimeFromTimestamp($this->timestamp);
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isBuyOrder(): bool {
+		return $this->execAmount > 0;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isSellOrder(): bool {
+		return $this->execAmount < 0;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isBuy(): bool {
+		return $this->execAmount > 0 XOR $this->isMaker;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isSell(): bool {
+		return $this->execAmount < 0 XOR $this->isMaker;
 	}
 
 }
