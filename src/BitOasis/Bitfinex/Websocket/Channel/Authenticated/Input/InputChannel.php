@@ -67,7 +67,7 @@ class InputChannel extends ConnectionAuthenticatedSubchannelAdapter {
 					$reply = $od->getOperation()->createResponse($data[2]);
 					$od->getDeferred()->resolve($reply);
 				} catch (OperationFailedException $e) {
-					$od->getDeferred()->reject($e->getMessage());
+					$od->getDeferred()->reject($e);
 				}
 				unset($operations[$key]);
 			}
