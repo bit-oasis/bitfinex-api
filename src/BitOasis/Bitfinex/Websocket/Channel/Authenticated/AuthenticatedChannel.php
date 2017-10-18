@@ -157,6 +157,10 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 		}
 	}
 
+	public function __toString() {
+		return 'authenticated channel with chanId=' . self::CHANNEL_ID;
+	}
+
 	protected function isAuthChannelRequired(): bool {
 		return !empty($this->subchannels);
 	}

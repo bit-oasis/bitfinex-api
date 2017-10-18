@@ -83,26 +83,29 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 			$this->connection = $conn;
 
 			$conn->on('message', function(MessageInterface $msg) use($conn) {
-				$data = Json::decode($msg, JSON_OBJECT_AS_ARRAY);
-				$this->logger->debug('Bitfinex message received: {message}', ['message' => $data]);
+				$stringMsg = (string)$msg;
+				$data = Json::decode($stringMsg, JSON_OBJECT_AS_ARRAY);
+				if (!(isset($data[1]) && $data[1] === 'hb')) {
+					$this->logger->debug('Bitfinex message received: {message}', ['message' => $stringMsg]);
+				}
 				$event = $data['event'] ?? null;
 				if($event === null) {
 					foreach ($this->subscribers as $subscriber) {
 						$subscriber->onWebsocketMessageReceived($data);
 					}
 				} else if($event === 'subscribed') {
-					$this->logger->debug('Subscribed to channel {channel}', ['channel' => $data]);
+					$this->logger->debug('Subscribed to channel {channel}', ['channel' => $stringMsg]);
 					foreach ($this->subscribers as $subscriber) {
 						$subscriber->onWebsocketChannelSubscribed($data);
 					}
 				} else if($event === 'unsubscribed') {
-					$this->logger->debug('Unsubscribed from channel {channel}', ['channel' => $data]);
+					$this->logger->debug('Unsubscribed from channel {channel}', ['channel' => $stringMsg]);
 					foreach ($this->subscribers as $subscriber) {
 						$subscriber->onWebsocketChannelUnsubscribed($data);
 					}
 				} else if($event === 'auth') {
 					if ($data['status'] !== 'OK') {
-						$this->logger->error('Websocket authenticated failed: {error}', ['error' => $data]);
+						$this->logger->error('Websocket authenticated failed: {error}', ['error' => $stringMsg]);
 						throw new AuthenticationFailedException('Bitfinex authentication failed: ' . $data['msg']);
 					}
 					$this->logger->info('Websocket authenticated');
@@ -110,7 +113,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 						$subscriber->onWebsocketAuthenticated();
 					}
 				} else if($event === 'error') {
-					$this->logger->warning('Error event received: {error}', ['error' => $data]);
+					$this->logger->warning('Error event received: {error}', ['error' => $stringMsg]);
 					foreach ($this->subscribers as $subscriber) {
 						$subscriber->onWebsocketErrorMessage($data);
 					}
@@ -122,17 +125,17 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 						}
 					} else if (isset($data['code'])) {
 						if ($data['code'] === 20060) { // 20060 : Entering in Maintenance mode. Please pause any activity and resume after receiving the info message 20061 (it should take 120 seconds at most).
-							$this->logger->info('Bitfinex maintenance mode started: {data}', ['data' => $data]);
+							$this->logger->info('Bitfinex maintenance mode started: {data}', ['data' => $stringMsg]);
 							foreach ($this->subscribers as $subscriber) {
 								$subscriber->onMaintenanceStarted();
 							}
 						} else if ($data['code'] === 20061) { // 20061 : Maintenance ended. You can resume normal activity. It is advised to unsubscribe/subscribe again all channels.
-							$this->logger->info('Bitfinex maintenance mode ended: {data}', ['data' => $data]);
+							$this->logger->info('Bitfinex maintenance mode ended: {data}', ['data' => $stringMsg]);
 							foreach ($this->subscribers as $subscriber) {
 								$subscriber->onMaintenanceEnded($conn);
 							}
 						} else if ($data['code'] === 20051) { // 20051 : Stop/Restart Websocket Server (please reconnect)
-							$this->logger->info('Bitfinex websocket restart requested: {data}', ['data' => $data]);
+							$this->logger->info('Bitfinex websocket restart requested: {data}', ['data' => $stringMsg]);
 							$conn->close();
 						}
 					}

@@ -7,7 +7,7 @@ use BitOasis\Bitfinex\Websocket\ConnectionWebsocketSubscriberAdapter;
 /**
  * @author David Fiedor <davefu@seznam.cz>
  */
-class ConnectionAuthenticatedSubchannelAdapter extends ConnectionWebsocketSubscriberAdapter implements AuthenticatedSubchannel {
+abstract class ConnectionAuthenticatedSubchannelAdapter extends ConnectionWebsocketSubscriberAdapter implements AuthenticatedSubchannel {
 
 	/** @var bool */
 	protected $authenticated = false;

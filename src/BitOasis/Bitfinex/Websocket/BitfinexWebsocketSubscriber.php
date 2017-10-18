@@ -29,4 +29,6 @@ interface BitfinexWebsocketSubscriber {
 
 	public function onMaintenanceEnded(WebSocket $conn);
 
+	public function __toString();
+
 }

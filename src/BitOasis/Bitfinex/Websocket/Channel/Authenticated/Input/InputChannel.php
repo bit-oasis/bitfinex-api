@@ -8,12 +8,16 @@ use BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\Operation\Operation;
 use BitOasis\Bitfinex\Websocket\Channel\Authenticated\Input\Operation\MultiOperation;
 use BitOasis\Bitfinex\Websocket\Channel\Authenticated\ConnectionAuthenticatedSubchannelAdapter;
 use Nette\Utils\Json;
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
 use React\Promise\Promise;
 
 /**
  * @author Daniel Robenek <daniel.robenek@me.com>
  */
-class InputChannel extends ConnectionAuthenticatedSubchannelAdapter {
+class InputChannel extends ConnectionAuthenticatedSubchannelAdapter implements LoggerAwareInterface {
+
+	use LoggerAwareTrait;
 
 	protected $operationsByReplyCode = [];
 
@@ -38,7 +42,9 @@ class InputChannel extends ConnectionAuthenticatedSubchannelAdapter {
 			null,
 			$operation->getOperationData(),
 		]);
-		echo($json . "\n");
+
+		$this->logger->debug('New Bitfinex input operation: {operation}', ['operation' => $json]);
+
 		$this->connection->send($json);
 
 		$od = new OperationAndDeferred($operation);
@@ -54,6 +60,10 @@ class InputChannel extends ConnectionAuthenticatedSubchannelAdapter {
 			$this->operationsByReplyCode[$operationNotificationCode][] = $od;
 		}
 		return $od->promise();
+	}
+
+	public function __toString() {
+		return 'input channel';
 	}
 
 	/**

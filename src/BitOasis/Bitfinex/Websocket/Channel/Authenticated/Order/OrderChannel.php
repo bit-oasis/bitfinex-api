@@ -43,6 +43,10 @@ class OrderChannel extends ConnectionAuthenticatedSubchannelAdapter {
 		}
 	}
 
+	public function __toString() {
+		return 'order authenticated channel';
+	}
+
 	protected function fireOnUpdateReceived(OrderMessage $message) {
 		foreach ($this->subscribers as $subscriber) {
 			$subscriber->onOrderUpdateReceived($message);

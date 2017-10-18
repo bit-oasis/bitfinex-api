@@ -7,7 +7,7 @@ use Ratchet\Client\WebSocket;
 /**
  * @author Daniel Robenek <daniel.robenek@me.com>
  */
-class ConnectionWebsocketSubscriberAdapter implements BitfinexWebsocketSubscriber {
+abstract class ConnectionWebsocketSubscriberAdapter implements BitfinexWebsocketSubscriber {
 
 	/** @var WebSocket */
 	protected $connection;

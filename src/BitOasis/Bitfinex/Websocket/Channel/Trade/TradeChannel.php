@@ -136,6 +136,10 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 		}
 	}
 
+	public function __toString() {
+		return $this->symbol . ' ' . self::CHANNEL_NAME . ' channel with ' . ($this->channelId === null ? '' : 'chanId=' . $this->channelId . ', ');
+	}
+
 	protected function subscribe(WebSocket $conn): Promise {
 		$deferred = new Deferred();
 		if (empty($this->subscribeDeferred)) {

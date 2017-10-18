@@ -43,4 +43,8 @@ class TradeChannel extends ConnectionAuthenticatedSubchannelAdapter {
 		}
 	}
 
+	public function __toString() {
+		return 'trade authenticated channel';
+	}
+
 }
