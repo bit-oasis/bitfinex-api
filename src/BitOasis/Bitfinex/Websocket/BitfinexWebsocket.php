@@ -84,6 +84,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 	}
 
 	public function connect(): PromiseInterface {
+		$this->logger->debug('Bitfinex connection requested');
 		$connector = new Connector($this->loop);
 		return $connector(self::WEBSOCKET_URL, [], ['Origin' => $this->origin])->then(function(WebSocket $conn) {
 			$this->connection = $conn;
