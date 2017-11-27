@@ -48,10 +48,10 @@ class OrderMessage {
 	/** @var float */
 	protected $avgPrice;
 
-	/** @var float */
+	/** @var float|null */
 	protected $trailingPrice;
 
-	/** @var float */
+	/** @var float|null */
 	protected $auxLimitPrice;
 
 	/** @var bool */
@@ -63,7 +63,7 @@ class OrderMessage {
 	/** @var int */
 	protected $placedId;
 
-	public function __construct(int $id, /*?int */$gid, int $cid, string $symbol, int $timestampCreated, int $timestampUpdated, float $remainingAmount, float $originalAmount, string $type, /*?string */$previousType, string $orderStatus, float $price, float $avgPrice, float $trailingPrice, float $auxLimitPrice, bool $notify, bool $hidden, int $placedId) {
+	public function __construct(int $id, /*?int */$gid, int $cid, string $symbol, int $timestampCreated, int $timestampUpdated, float $remainingAmount, float $originalAmount, string $type, /*?string */$previousType, string $orderStatus, float $price, float $avgPrice, /*?float */$trailingPrice, /*?float */$auxLimitPrice, bool $notify, bool $hidden, int $placedId) {
 		$this->id = $id;
 		$this->gid = $gid;
 		$this->cid = $cid;
@@ -218,16 +218,16 @@ class OrderMessage {
 	}
 
 	/**
-	 * @return float
+	 * @return float|null
 	 */
-	public function getTrailingPrice(): float {
+	public function getTrailingPrice()/*: ?float*/ {
 		return $this->trailingPrice;
 	}
 
 	/**
-	 * @return float
+	 * @return float|null
 	 */
-	public function getAuxLimitPrice(): float {
+	public function getAuxLimitPrice()/*: ?float*/ {
 		return $this->auxLimitPrice;
 	}
 
