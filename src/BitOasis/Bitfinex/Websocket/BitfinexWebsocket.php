@@ -48,6 +48,9 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 	/** @var TimerInterface|null */
 	protected $reconnectTimer;
 
+	/** @var bool */
+	protected $reconnectOnError = true;
+
 	public function __construct(string $apiKey = null, string $apiSecret = null, LoopInterface $loop) {
 		$this->authChannel = new AuthenticatedChannel($apiKey, $apiSecret, $loop);
 		$this->subscribers[] = $this->authChannel;
@@ -58,6 +61,10 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 	public function setLogger(LoggerInterface $logger) {
 		$this->authChannel->setLogger($logger);
 		$this->logger = $logger;
+	}
+
+	public function setReconnectOnError(bool $reconnectOnError) {
+		$this->reconnectOnError = $reconnectOnError;
 	}
 
 	/**
@@ -88,6 +95,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 		$connector = new Connector($this->loop);
 		return $connector(self::WEBSOCKET_URL, [], ['Origin' => $this->origin])->then(function(WebSocket $conn) {
 			$this->connection = $conn;
+			$this->logger->debug('Websocket connection created');
 
 			$conn->on('message', function(MessageInterface $msg) use($conn) {
 				$stringMsg = (string)$msg;
@@ -159,10 +167,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 					$this->closeDeferred->resolve();
 					$this->closeDeferred = null;
 				} else {
-					$this->reconnectTimer = $this->loop->addTimer(10, function() {
-						$this->reconnectTimer = null;
-						$this->connect();
-					});
+					$this->reconnect(10);
 				}
 			});
 
@@ -171,6 +176,17 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 			foreach ($this->subscribers as $subscriber) {
 				$subscriber->onWebsocketClosed();
 			}
+
+			$this->logger->error('Error during websocket connection ({message})', ['message' => rtrim(strtok($e->getMessage(), "\n"))]);
+
+			$this->connection = null;
+			if ($this->closeDeferred !== null) {
+				$this->closeDeferred->resolve();
+				$this->closeDeferred = null;
+			} else {
+				$this->reconnect(60);
+			}
+
 			throw $e;
 		});
 	}
@@ -194,6 +210,16 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 
 	protected function isRunning(): bool {
 		return $this->connection !== null;
+	}
+
+	protected function reconnect(int $delay) {
+		if ($this->reconnectTimer === null && $this->reconnectOnError) {
+			$this->logger->notice('Reconnecting websocket in {delay} seconds', ['delay' => $delay]);
+			$this->reconnectTimer = $this->loop->addTimer($delay, function() {
+				$this->reconnectTimer = null;
+				$this->connect();
+			});
+		}
 	}
 
 }
