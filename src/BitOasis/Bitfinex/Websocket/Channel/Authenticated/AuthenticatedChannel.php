@@ -40,11 +40,11 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 	/** @var bool */
 	protected $authenticated = false;
 
-	/** @var Deferred[] */
-	protected $subscribeDeferred = [];
+	/** @var Deferred|null */
+	protected $subscribeDeferred;
 
-	/** @var Deferred[] */
-	protected $unsubscribeDeferred = [];
+	/** @var Deferred|null */
+	protected $unsubscribeDeferred;
 
 	/** @var bool */
 	protected $lastStatusSentWasStarted = false;
@@ -92,10 +92,10 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 		foreach ($this->subchannels as $subchannel) {
 			$subchannel->onWebsocketAuthenticated();
 		}
-		foreach ($this->subscribeDeferred as $deferred) {
-			$deferred->resolve();
+		if ($this->subscribeDeferred !== null) {
+			$this->subscribeDeferred->resolve();
+			$this->subscribeDeferred = null;
 		}
-		$this->subscribeDeferred = [];
 		$this->hb->addChannel(self::CHANNEL_ID);
 		$this->fireOnAuthChannelStarted();
 	}
@@ -107,12 +107,8 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 	}
 
 	public function onWebsocketChannelUnsubscribed($data) {
-		if (!empty($this->unsubscribeDeferred) && $data['chanId'] === self::CHANNEL_ID) {
+		if ($this->unsubscribeDeferred !== null && $data['chanId'] === self::CHANNEL_ID) {
 			if ($data['status'] === 'OK') {
-				foreach ($this->unsubscribeDeferred as $deferred) {
-					$deferred->resolve();
-				}
-				$this->unsubscribeDeferred = [];
 				$this->removeStoppedChannelData();
 				foreach ($this->subchannels as $subchannel) {
 					$subchannel->onWebsocketChannelUnsubscribed($data);
@@ -167,30 +163,28 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 
 	protected function subscribe(WebSocket $conn): ExtendedPromiseInterface {
 		if ($this->isAuthChannelRequired()) {
-			$deferred = new Deferred();
-			if (empty($this->subscribeDeferred)) {
+			if ($this->subscribeDeferred === null) {
 				$this->logger->debug('Authentication requested');
 				$conn->send(Json::encode($this->getAuthentication()));
+				$this->subscribeDeferred = new Deferred();
 			}
-			$this->subscribeDeferred[] = $deferred;
-			return $deferred->promise();
+			return $this->subscribeDeferred->promise();
 		}
 		return Promise\resolve();
 	}
 
 	protected function unsubscribe(WebSocket $conn): ExtendedPromiseInterface {
 		if ($this->isAuthChannelRequired()) {
-			$deferred = new Deferred();
-			if (empty($this->unsubscribeDeferred)) {
+			if ($this->unsubscribeDeferred === null) {
 				$data = [
 					'event' => 'unsubscribe',
 					'chanId' => self::CHANNEL_ID,
 				];
 				$conn->send(Json::encode($data));
 				$this->logger->debug('Websocket message sent: {data}', ['data' => $data]);
+				$this->unsubscribeDeferred = new Deferred();
 			}
-			$this->unsubscribeDeferred[] = $deferred;
-			return $deferred->promise();
+			return $this->unsubscribeDeferred->promise();
 		}
 		return Promise\resolve();
 	}
@@ -246,6 +240,14 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 	protected function removeStoppedChannelData() {
 		if ($this->authenticated) {
 			$this->hb->removeChannel(self::CHANNEL_ID);
+			if ($this->subscribeDeferred !== null) {
+				$this->subscribeDeferred->reject();
+				$this->subscribeDeferred = null;
+			}
+			if ($this->unsubscribeDeferred !== null) {
+				$this->unsubscribeDeferred->resolve();
+				$this->unsubscribeDeferred = null;
+			}
 			$this->fireOnAuthChannelStopped();
 		}
 		$this->authenticated = false;

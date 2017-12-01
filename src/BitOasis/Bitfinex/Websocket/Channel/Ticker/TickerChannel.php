@@ -28,11 +28,11 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 	/** @var TickerChannelSubscriber[] */
 	protected $subscribers = [];
 
-	/** @var Deferred[] */
-	protected $subscribeDeferred = [];
+	/** @var Deferred|null */
+	protected $subscribeDeferred;
 
-	/** @var Deferred[] */
-	protected $unsubscribeDeferred = [];
+	/** @var Deferred|null */
+	protected $unsubscribeDeferred;
 
 	/** @var bool */
 	protected $lastStatusSentWasStarted = false;
@@ -75,10 +75,10 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 	public function onWebsocketErrorMessage($data) {
 		if ($this->areChannelDataValid($data)) {
 			$this->logger->error("Can't subscribe to orderbook channel: {message} ({code})", ['message' => $data['msg'], 'code' => $data['code']]);
-			foreach ($this->subscribeDeferred as $deferred) {
-				$deferred->reject();
+			if ($this->subscribeDeferred !== null) {
+				$this->subscribeDeferred->reject();
+				$this->subscribeDeferred = null;
 			}
-			$this->subscribeDeferred = [];
 			throw new SubscriptionFailedException("Can't subscribe to orderbook channel: $data[msg] ($data[code])"); // todo: handle specific situations
 		}
 	}
@@ -102,10 +102,10 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 
 	public function onWebsocketChannelSubscribed($data) {
 		if ($this->areChannelDataValid($data) && isset($data['chanId'])) {
-			foreach ($this->subscribeDeferred as $deferred) {
-				$deferred->resolve($data['chanId']);
+			if ($this->subscribeDeferred !== null) {
+				$this->subscribeDeferred->resolve($data['chanId']);
+				$this->subscribeDeferred = null;
 			}
-			$this->subscribeDeferred = [];
 
 			$this->channelId = $data['chanId'];
 			$this->hb->addChannel($this->channelId);
@@ -116,10 +116,6 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 	public function onWebsocketChannelUnsubscribed($data) {
 		if ($this->channelId !== null && $data['chanId'] === $this->channelId) {
 			if ($data['status'] === 'OK') {
-				foreach ($this->unsubscribeDeferred as $deferred) {
-					$deferred->resolve();
-				}
-				$this->unsubscribeDeferred = [];
 				$this->removeStoppedChannelData();
 			} else {
 				throw new SubscriptionFailedException("Can't unsubscribe from orderbook channel: $data[msg] ($data[code])"); // todo: handle specific situations
@@ -132,8 +128,7 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 	}
 
 	protected function subscribe(WebSocket $conn): Promise {
-		$deferred = new Deferred();
-		if (empty($this->subscribeDeferred)) {
+		if ($this->subscribeDeferred === null) {
 			$data = Json::encode([
 				'event' => 'subscribe',
 				'channel' => self::CHANNEL_NAME,
@@ -141,28 +136,35 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 			]);
 			$conn->send($data);
 			$this->logger->debug('Websocket message sent: {data}', ['data' => $data]);
+			$this->subscribeDeferred = new Deferred();
 		}
-		$this->subscribeDeferred[] = $deferred;
-		return $deferred->promise();
+		return $this->subscribeDeferred->promise();
 	}
 
 	protected function unsubscribe(WebSocket $conn): Promise {
-		$deferred = new Deferred();
-		if (empty($this->unsubscribeDeferred)) {
+		if ($this->unsubscribeDeferred === null) {
 			$data = Json::encode([
 				'event' => 'unsubscribe',
 				'chanId' => $this->channelId,
 			]);
 			$conn->send($data);
 			$this->logger->debug('Websocket message sent: {data}', ['data' => $data]);
+			$this->unsubscribeDeferred = new Deferred();
 		}
-		$this->unsubscribeDeferred[] = $deferred;
-		return $deferred->promise();
+		return $this->unsubscribeDeferred->promise();
 	}
 
 	protected function removeStoppedChannelData() {
 		if ($this->channelId !== null) {
 			$this->hb->removeChannel($this->channelId);
+			if ($this->subscribeDeferred !== null) {
+				$this->subscribeDeferred->reject();
+				$this->subscribeDeferred = null;
+			}
+			if ($this->unsubscribeDeferred !== null) {
+				$this->unsubscribeDeferred->resolve();
+				$this->unsubscribeDeferred = null;
+			}
 			$this->fireOnTickerStopped();
 		}
 		$this->channelId = null;
