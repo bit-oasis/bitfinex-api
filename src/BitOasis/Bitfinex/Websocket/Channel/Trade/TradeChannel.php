@@ -143,11 +143,13 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 	protected function subscribe(WebSocket $conn): Promise {
 		$deferred = new Deferred();
 		if (empty($this->subscribeDeferred)) {
-			$conn->send(Json::encode([
+			$data = [
 				'event' => 'subscribe',
 				'channel' => self::CHANNEL_NAME,
 				'symbol' => $this->symbol,
-			]));
+			];
+			$conn->send(Json::encode($data));
+			$this->logger->debug('Websocket message sent: {data}', ['data' => $data]);
 		}
 		$this->subscribeDeferred[] = $deferred;
 		return $deferred->promise();
@@ -156,10 +158,12 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 	protected function unsubscribe(WebSocket $conn): Promise {
 		$deferred = new Deferred();
 		if (empty($this->unsubscribeDeferred)) {
-			$conn->send(Json::encode([
+			$data = [
 				'event' => 'unsubscribe',
 				'chanId' => $this->channelId,
-			]));
+			];
+			$conn->send(Json::encode($data));
+			$this->logger->debug('Websocket message sent: {data}', ['data' => $data]);
 		}
 		$this->unsubscribeDeferred[] = $deferred;
 		return $deferred->promise();

@@ -182,10 +182,12 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 		if ($this->isAuthChannelRequired()) {
 			$deferred = new Deferred();
 			if (empty($this->unsubscribeDeferred)) {
-				$conn->send(Json::encode([
+				$data = [
 					'event' => 'unsubscribe',
 					'chanId' => self::CHANNEL_ID,
-				]));
+				];
+				$conn->send(Json::encode($data));
+				$this->logger->debug('Websocket message sent: {data}', ['data' => $data]);
 			}
 			$this->unsubscribeDeferred[] = $deferred;
 			return $deferred->promise();

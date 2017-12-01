@@ -170,8 +170,6 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 					$this->reconnect(10);
 				}
 			});
-
-			$this->logger->debug('Connecting to Bitfinex websocket');
 		}, function(\Exception $e) {
 			foreach ($this->subscribers as $subscriber) {
 				$subscriber->onWebsocketClosed();
@@ -184,7 +182,7 @@ class BitfinexWebsocket implements LoggerAwareInterface {
 				$this->closeDeferred->resolve();
 				$this->closeDeferred = null;
 			} else {
-				$this->reconnect(60);
+				$this->reconnect(rand(55, 65));
 			}
 
 			throw $e;
