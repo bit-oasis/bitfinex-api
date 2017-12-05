@@ -28,10 +28,10 @@ class TradeMessage {
 	/** @var float */
 	protected $execPrice;
 
-	/** @var string */
+	/** @var string|null */
 	protected $orderType;
 
-	/** @var float */
+	/** @var float|null */
 	protected $orderPrice;
 
 	/** @var bool */
@@ -43,7 +43,7 @@ class TradeMessage {
 	/** @var string|null */
 	protected $feeCurrency;
 
-	public function __construct(int $id, string $pair, int $timestamp, int $orderId, float $execAmount, float $execPrice, string $orderType, float $orderPrice, bool $isMaker, float $fee = null, string $feeCurrency = null) {
+	public function __construct(int $id, string $pair, int $timestamp, int $orderId, float $execAmount, float $execPrice, string $orderType = null, float $orderPrice = null, bool $isMaker = null, float $fee = null, string $feeCurrency = null) {
 		$this->id = $id;
 		$this->pair = $pair;
 		$this->timestamp = $timestamp;
@@ -126,16 +126,16 @@ class TradeMessage {
 	}
 
 	/**
-	 * @return string
+	 * @return string|null
 	 */
-	public function getOrderType(): string {
+	public function getOrderType() {
 		return $this->orderType;
 	}
 
 	/**
-	 * @return float
+	 * @return float|null
 	 */
-	public function getOrderPrice(): float {
+	public function getOrderPrice() {
 		return $this->orderPrice;
 	}
 
