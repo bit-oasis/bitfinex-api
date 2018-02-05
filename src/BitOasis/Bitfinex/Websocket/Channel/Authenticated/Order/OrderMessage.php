@@ -178,8 +178,22 @@ class OrderMessage {
 	/**
 	 * @return float
 	 */
+	public function getRemainingAmountAbs(): float {
+		return abs($this->remainingAmount);
+	}
+
+	/**
+	 * @return float
+	 */
 	public function getOriginalAmount(): float {
 		return $this->originalAmount;
+	}
+
+	/**
+	 * @return float
+	 */
+	public function getOriginalAmountAbs(): float {
+		return abs($this->originalAmount);
 	}
 
 	/**
@@ -252,32 +266,67 @@ class OrderMessage {
 		return $this->placedId;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isStatusActive(): bool {
 		return 0 === strpos($this->orderStatus, 'ACTIVE');
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isStatusCanceled(): bool {
 		return 0 === strpos($this->orderStatus, 'CANCELED');
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isStatusExecuted(): bool {
 		return 0 === strpos($this->orderStatus, 'EXECUTED');
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isStatusPartiallyFilled(): bool {
 		return 0 === strpos($this->orderStatus, 'PARTIALLY FILLED');
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isStatusInsufficientMargin(): bool {
 		return 0 === strpos($this->orderStatus, 'INSUFFICIENT MARGIN');
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isLive(): bool {
 	    return $this->isStatusActive() || $this->isStatusPartiallyFilled();
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isCanceled(): bool {
 		return $this->isStatusCanceled() || $this->isStatusInsufficientMargin();
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isBuy(): bool {
+		return $this->originalAmount > 0;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isSell(): bool {
+		return $this->originalAmount < 0;
 	}
 
 }
