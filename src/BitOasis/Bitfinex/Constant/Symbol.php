@@ -11,6 +11,7 @@ final class Symbol {
 	const TETHUSD = 'tETHUSD';
 	const TXRPUSD = 'tXRPUSD';
 	const TLTCUSD = 'tLTCUSD';
+	const TBCHUSD = 'tBCHUSD';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
