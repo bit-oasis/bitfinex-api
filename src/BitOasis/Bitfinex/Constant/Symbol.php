@@ -13,6 +13,7 @@ final class Symbol {
 	const TLTCUSD = 'tLTCUSD';
 	const TBCHUSD = 'tBCHUSD';
 	const TZECUSD = 'tZECUSD';
+	const TXMRUSD = 'tXMRUSD';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
