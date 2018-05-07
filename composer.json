@@ -2,8 +2,9 @@
     "name": "bit-oasis/bitfinex-api",
     "require": {
         "nette/utils": "^2.4",
-        "react/react": "dev-master",
-        "ratchet/pawl": "^0.2.3",
+        "react/promise": "^2.2",
+        "react/event-loop": "~0.4",
+        "ratchet/pawl": "^0.2.3|^0.3.1",
         "psr/log": "^1.0"
     },
     "authors": [
