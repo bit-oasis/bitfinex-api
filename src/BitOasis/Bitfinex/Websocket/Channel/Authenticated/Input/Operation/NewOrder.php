@@ -39,12 +39,13 @@ class NewOrder implements Operation {
 	/** @var bool|null */
 	protected $postonly;
 
-	public function __construct(int $cid, string $type, string $symbol, float $amount, float $price = null) {
+	public function __construct(int $cid, string $type, string $symbol, float $amount, float $price = null, float $priceAuxLimit = null) {
 		$this->cid = $cid;
 		$this->type = $type;
 		$this->symbol = $symbol;
 		$this->amount = $amount;
 		$this->price = $price;
+		$this->priceAuxLimit = $priceAuxLimit;
 	}
 
 	/**
@@ -63,6 +64,7 @@ class NewOrder implements Operation {
 
 	/**
 	 * @param float|null $priceAuxLimit
+	 * @deprecated use constructor instead
 	 */
 	public function setPriceAuxLimit(float $priceAuxLimit) {
 		$this->priceAuxLimit = $priceAuxLimit;
@@ -104,7 +106,7 @@ class NewOrder implements Operation {
 			$data['price_trailing'] = $this->priceTrailing;
 		}
 		if ($this->priceAuxLimit !== null) {
-			$data['price_aux_limit'] = $this->priceAuxLimit;
+			$data['price_aux_limit'] = (string)$this->priceAuxLimit;
 		}
 		if ($this->hidden !== null) {
 			$data['hidden'] = $this->hidden ? 1 : 0;
