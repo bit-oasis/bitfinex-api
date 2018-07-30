@@ -11,7 +11,7 @@ use BitOasis\Bitfinex\Constant\OrderType;
 class OrderMessage {
 
 	/** @var array */
-	const STOP_ORDER_TYPES = [OrderType::STOP_LIMIT, OrderType::STOP];
+	const STOP_ORDER_TYPES = [OrderType::EXCHANGE_STOP_LIMIT, OrderType::EXCHANGE_STOP, OrderType::STOP_LIMIT, OrderType::STOP];
 
 	/** @var int */
 	protected $id;
