@@ -337,6 +337,9 @@ class OrderMessage {
 	 * @return bool
 	 */
 	public function isStopPriceTriggered(): bool {
+		if (in_array($this->type, [OrderType::EXCHANGE_STOP, OrderType::STOP]) && !$this->isCanceled() && (!$this->isStatusActive() || $this->isStatusPartiallyFilled())) {
+			return true;
+		}
 		return $this->previousType !== null && in_array($this->previousType, self::STOP_ORDER_TYPES) && $this->type !== $this->previousType;
 	}
 
