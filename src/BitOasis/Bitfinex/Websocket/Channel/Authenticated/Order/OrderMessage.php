@@ -3,11 +3,15 @@
 namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated\Order;
 
 use BitOasis\Bitfinex\Utils\DateTimeUtils;
+use BitOasis\Bitfinex\Constant\OrderType;
 
 /**
  * @author Daniel Robenek <daniel.robenek@me.com>
  */
 class OrderMessage {
+
+	/** @var array */
+	const STOP_ORDER_TYPES = [OrderType::EXCHANGE_STOP_LIMIT, OrderType::EXCHANGE_STOP, OrderType::STOP_LIMIT, OrderType::STOP];
 
 	/** @var int */
 	protected $id;
@@ -327,6 +331,16 @@ class OrderMessage {
 	 */
 	public function isSell(): bool {
 		return $this->originalAmount < 0;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public function isStopPriceTriggered(): bool {
+		if (in_array($this->type, [OrderType::EXCHANGE_STOP, OrderType::STOP]) && !$this->isCanceled() && (!$this->isStatusActive() || $this->isStatusPartiallyFilled())) {
+			return true;
+		}
+		return $this->previousType !== null && in_array($this->previousType, self::STOP_ORDER_TYPES) && $this->type !== $this->previousType;
 	}
 
 }
