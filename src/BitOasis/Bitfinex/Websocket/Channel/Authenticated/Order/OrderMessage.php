@@ -341,7 +341,7 @@ class OrderMessage {
 		if (in_array($this->type, [OrderType::EXCHANGE_STOP, OrderType::STOP]) && !$this->isCanceled() && (!$isActive || $this->isStatusPartiallyFilled())) {
 			return true;
 		}
-		return $this->previousType !== null && in_array($this->previousType, self::STOP_ORDER_TYPES) && $this->type !== $this->previousType && $isActive && $this->remainingAmount === $this->originalAmount;
+		return $this->previousType !== null && in_array($this->previousType, self::STOP_ORDER_TYPES) && $this->type !== $this->previousType;
 	}
 
 }
