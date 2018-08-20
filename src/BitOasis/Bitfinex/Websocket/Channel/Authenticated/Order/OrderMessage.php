@@ -337,10 +337,11 @@ class OrderMessage {
 	 * @return bool
 	 */
 	public function isStopPriceTriggered(): bool {
-		if (in_array($this->type, [OrderType::EXCHANGE_STOP, OrderType::STOP]) && !$this->isCanceled() && (!$this->isStatusActive() || $this->isStatusPartiallyFilled())) {
+		$isActive = $this->isStatusActive();
+		if (in_array($this->type, [OrderType::EXCHANGE_STOP, OrderType::STOP]) && !$this->isCanceled() && (!$isActive || $this->isStatusPartiallyFilled())) {
 			return true;
 		}
-		return $this->previousType !== null && in_array($this->previousType, self::STOP_ORDER_TYPES) && $this->type !== $this->previousType;
+		return $this->previousType !== null && in_array($this->previousType, self::STOP_ORDER_TYPES) && $this->type !== $this->previousType && $isActive && $this->remainingAmount === $this->originalAmount;
 	}
 
 }
