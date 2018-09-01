@@ -22,6 +22,7 @@ final class Symbol {
 	const TZECUSD = 'tZECUSD';
 	const TZECBTC = 'tZECBTC';
 	const TXMRUSD = 'tXMRUSD';
+	const TXLMUSD = 'tXLMUSD';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
