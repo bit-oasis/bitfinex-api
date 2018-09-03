@@ -57,6 +57,10 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 		$this->logger = new NullLogger();
 	}
 
+	public function getHb(): HeartBeat {
+		return $this->hb;
+	}
+
 	public function addOrderBookChannelSubscriber(OrderBookChannelSubscriber $subscriber) {
 	    $this->subscribers[] = $subscriber;
 	}

@@ -43,6 +43,9 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 		$this->logger = new NullLogger();
 	}
 
+	public function getHb(): HeartBeat {
+		return $this->hb;
+	}
 
 	public function addTickerChannelSubscriber(TickerChannelSubscriber $subscriber) {
 	    $this->subscribers[] = $subscriber;

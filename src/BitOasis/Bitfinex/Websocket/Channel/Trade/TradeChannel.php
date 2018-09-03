@@ -43,6 +43,9 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 		$this->logger = new NullLogger();
 	}
 
+	public function getHb(): HeartBeat {
+		return $this->hb;
+	}
 
 	public function addTradeChannelSubscriber(TradeChannelSubscriber $subscriber) {
 	    $this->subscribers[] = $subscriber;

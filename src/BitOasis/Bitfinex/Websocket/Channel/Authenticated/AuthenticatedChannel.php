@@ -56,6 +56,10 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 		$this->logger = new NullLogger();
 	}
 
+	public function getHb(): HeartBeat {
+		return $this->hb;
+	}
+
 	/**
 	 * @param AuthenticatedSubchannel $subchannel
 	 * @throws CannotAddSubscriberException
