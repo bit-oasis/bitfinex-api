@@ -13,9 +13,6 @@ final class Symbol {
 	const TETCBTC = 'tETCBTC';
 	const TETHBTC = 'tETHBTC';
 	const TXRPBTC = 'tXRPBTC';
-	const TBCHUSD = 'tBCHUSD';
-	const TBCHBTC = 'tBCHBTC';
-	const TBCHETH = 'tBCHETH';
 	const TXRPUSD = 'tXRPUSD';
 	const TLTCUSD = 'tLTCUSD';
 	const TLTCBTC = 'tLTCBTC';
@@ -23,6 +20,9 @@ final class Symbol {
 	const TZECBTC = 'tZECBTC';
 	const TXMRUSD = 'tXMRUSD';
 	const TXLMUSD = 'tXLMUSD';
+	const TBCHUSD = 'tBABUSD';
+	const TBCHBTC = 'tBABBTC';
+	const TBCHETH = 'tBABETH';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
