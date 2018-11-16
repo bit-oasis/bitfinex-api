@@ -23,6 +23,8 @@ final class Symbol {
 	const TBCHUSD = 'tBABUSD';
 	const TBCHBTC = 'tBABBTC';
 	const TBCHETH = 'tBABETH';
+	const TBSVUSD = 'tBSVUSD';
+	const TBSVBTC = 'tBSVBTC';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
