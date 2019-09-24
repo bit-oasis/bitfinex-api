@@ -26,6 +26,7 @@ final class Symbol {
 	const TBSVUSD = 'tBSVUSD';
 	const TBSVBTC = 'tBSVBTC';
 	const TEOSUSD = 'tEOSUSD';
+	const TEOSBTC = 'tEOSBTC';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
