@@ -9,6 +9,8 @@ interface TradeChannelSubscriber {
 	
 	public function onTradeUpdateReceived(TradeMessage $message);
 
+	public function onTradeSnapshotReceived(TradeSnapshotMessage $message);
+
 	public function onTradeStarted();
 
 	public function onTradeStopped();

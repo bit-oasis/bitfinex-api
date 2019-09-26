@@ -69,11 +69,13 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 			}
 			$update = in_array($data[1], ['te', 'tu'], true) ? $data[2] : $data[1];
 			if (count($update) === 0 || is_array($update[0])) {
-				foreach ($update as $item) {
-					$message = new TradeMessage($item[0], $item[1], $item[2], $item[3]);
-					foreach ($this->subscribers as $subscriber) {
-						$subscriber->onTradeUpdateReceived($message);
-					}
+				$trades = \array_map(function(array $item) {
+					return new TradeMessage($item[0], $item[1], $item[2], $item[3]);
+				}, $update);
+				
+				$message = new TradeSnapshotMessage($trades);
+				foreach ($this->subscribers as $subscriber) {
+					$subscriber->onTradeSnapshotReceived($message);
 				}
 			} else {
 				$message = new TradeMessage($update[0], $update[1], $update[2], $update[3]);

@@ -9,6 +9,8 @@ interface OrderBookChannelSubscriber {
 
 	public function onOrderBookUpdateReceived(OrderBookMessage $message);
 
+	public function onOrderBookSnapshotReceived(OrderBookSnapshotMessage $message);
+
 	public function onOrderBookStarted();
 
 	public function onOrderBookStopped();

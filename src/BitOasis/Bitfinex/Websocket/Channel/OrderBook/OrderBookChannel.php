@@ -83,11 +83,13 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 			}
 			$update = $data[1];
 			if (count($update) === 0 || is_array($update[0])) {
-				foreach ($update as $item) {
-					$message = new OrderBookMessage($item[0], $item[1], $item[2]);
-					foreach ($this->subscribers as $subscriber) {
-						$subscriber->onOrderBookUpdateReceived($message);
-					}
+				$orders = \array_map(function(array $item) {
+					return new OrderBookMessage($item[0], $item[1], $item[2]);
+				}, $update);
+				
+				$message = new OrderBookSnapshotMessage($orders);
+				foreach ($this->subscribers as $subscriber) {
+					$subscriber->onOrderBookSnapshotReceived($message);
 				}
 			} else {
 				$message = new OrderBookMessage($update[0], $update[1], $update[2]);
