@@ -27,6 +27,15 @@ final class Symbol {
 	const TBSVBTC = 'tBSVBTC';
 	const TEOSUSD = 'tEOSUSD';
 	const TEOSBTC = 'tEOSBTC';
+	const TEOSETH = 'tEOSETH';
+	const TOMGUSD = 'tOMGUSD';
+	const TOMGBTC = 'tOMGBTC';
+	const TZRXUSD = 'tZRXUSD';
+	const TZRXBTC = 'tZRXBTC';
+	const TBATUSD = 'tBATUSD';
+	const TBATBTC = 'tBATBTC';
+	const TALGUSD = 'tALGUSD';
+	const TALGBTC = 'tALGBTC';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
