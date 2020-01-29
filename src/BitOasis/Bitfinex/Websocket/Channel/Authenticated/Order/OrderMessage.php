@@ -308,6 +308,13 @@ class OrderMessage {
 	/**
 	 * @return bool
 	 */
+	public function isStatusOrderBookSlip(): bool {
+		return 0 === strpos($this->orderStatus, 'RSN_BOOK_SLIP');
+	}
+
+	/**
+	 * @return bool
+	 */
 	public function isLive(): bool {
 	    return $this->isStatusActive() || $this->isStatusPartiallyFilled();
 	}
@@ -316,7 +323,7 @@ class OrderMessage {
 	 * @return bool
 	 */
 	public function isCanceled(): bool {
-		return $this->isStatusCanceled() || $this->isStatusInsufficientMargin();
+		return $this->isStatusCanceled() || $this->isStatusInsufficientMargin() || $this->isStatusOrderBookSlip();
 	}
 
 	/**
