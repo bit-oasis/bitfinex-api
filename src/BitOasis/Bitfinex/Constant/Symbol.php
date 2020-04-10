@@ -37,6 +37,12 @@ final class Symbol {
 	const TALGUSD = 'tALGUSD';
 	const TALGBTC = 'tALGBTC';
 	const TUSTUSD = 'tUSTUSD';
+	const TBTCUST = 'tBTCUST';
+	const TETHUST = 'tETHUST';
+	const TNEOUSD = 'tNEOUSD';
+	const TNEOBTC = 'tNEOBTC';
+	const TXTZUSD = 'tXTZUSD';
+	const TXTZBTC = 'tXTZBTC';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
