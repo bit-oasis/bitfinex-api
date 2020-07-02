@@ -39,13 +39,17 @@ class NewOrder implements Operation {
 	/** @var bool|null */
 	protected $postonly;
 
-	public function __construct(int $cid, string $type, string $symbol, float $amount, float $price = null, float $priceAuxLimit = null) {
+	/** @var array|null */
+	protected $meta;
+
+	public function __construct(int $cid, string $type, string $symbol, float $amount, float $price = null, float $priceAuxLimit = null, array $meta = null) {
 		$this->cid = $cid;
 		$this->type = $type;
 		$this->symbol = $symbol;
 		$this->amount = $amount;
 		$this->price = $price;
 		$this->priceAuxLimit = $priceAuxLimit;
+		$this->meta = $meta;
 	}
 
 	/**
@@ -113,6 +117,9 @@ class NewOrder implements Operation {
 		}
 		if ($this->postonly !== null) {
 			$data['postonly'] = $this->postonly ? 1 : 0;
+		}
+		if (!empty($this->meta)) {
+			$data['meta'] = $this->meta;
 		}
 		return $data;
 	}
