@@ -43,6 +43,14 @@ final class Symbol {
 	const TNEOBTC = 'tNEOBTC';
 	const TXTZUSD = 'tXTZUSD';
 	const TXTZBTC = 'tXTZBTC';
+	const TDAIUSD = 'tDAIUSD';
+	const TDAIBTC = 'tDAIBTC';
+	const TMKRUSD = 'tMKRUSD';
+	const TMKRBTC = 'tMKRBTC';
+	const TREPUSD = 'tREPUSD';
+	const TREPBTC = 'tREPBTC';
+	const TKNCUSD = 'tKNCUSD';
+	const TKNCBTC = 'tKNCBTC';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
