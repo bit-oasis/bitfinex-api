@@ -20,9 +20,9 @@ final class Symbol {
 	const TZECBTC = 'tZECBTC';
 	const TXMRUSD = 'tXMRUSD';
 	const TXLMUSD = 'tXLMUSD';
-	const TBCHUSD = 'tBABUSD';
-	const TBCHBTC = 'tBABBTC';
-	const TBCHETH = 'tBABETH';
+	const TBCHUSD = 'tBCHNUSD';
+	const TBCHBTC = 'tBCHNBTC';
+	const TBCHETH = 'tBCHNETH';
 	const TBSVUSD = 'tBSVUSD';
 	const TBSVBTC = 'tBSVBTC';
 	const TEOSUSD = 'tEOSUSD';
