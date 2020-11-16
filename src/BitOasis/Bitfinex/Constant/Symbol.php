@@ -51,6 +51,11 @@ final class Symbol {
 	const TREPBTC = 'tREPBTC';
 	const TKNCUSD = 'tKNCUSD';
 	const TKNCBTC = 'tKNCBTC';
+	const TUNIUSD = 'tUNIUSD';
+	const TYFIUSD = 'tYFIUSD';
+	const TBALUSD = 'tBALUSD';
+	const TCOMPUSD = 'tCOMP:USD';
+	const TSNXUSD = 'tSNXUSD';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
