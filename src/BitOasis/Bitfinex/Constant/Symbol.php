@@ -56,6 +56,7 @@ final class Symbol {
 	const TBALUSD = 'tBALUSD';
 	const TCOMPUSD = 'tCOMP:USD';
 	const TSNXUSD = 'tSNXUSD';
+	const TDOGEUSD = 'tDOGE:USD';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';
