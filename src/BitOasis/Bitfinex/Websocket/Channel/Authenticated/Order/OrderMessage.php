@@ -28,7 +28,7 @@ class OrderMessage {
 	/** @var int in milliseconds */
 	protected $timestampCreated;
 
-	/** @var int in milliseconds */
+	/** @var int|null in milliseconds */
 	protected $timestampUpdated;
 
 	/** @var float */
@@ -67,7 +67,7 @@ class OrderMessage {
 	/** @var int|null */
 	protected $placedId;
 
-	public function __construct(int $id, /*?int */$gid, int $cid, string $symbol, int $timestampCreated, int $timestampUpdated, float $remainingAmount, float $originalAmount, string $type, /*?string */$previousType, string $orderStatus, float $price, float $avgPrice, /*?float */$trailingPrice, /*?float */$auxLimitPrice, bool $notify, bool $hidden, int $placedId = null) {
+	public function __construct(int $id, /*?int */$gid, int $cid, string $symbol, int $timestampCreated, /*?int */ $timestampUpdated, float $remainingAmount, float $originalAmount, string $type, /*?string */$previousType, string $orderStatus, float $price, float $avgPrice, /*?float */$trailingPrice, /*?float */$auxLimitPrice, bool $notify, bool $hidden, int $placedId = null) {
 		$this->id = $id;
 		$this->gid = $gid;
 		$this->cid = $cid;
@@ -159,17 +159,17 @@ class OrderMessage {
 	}
 
 	/**
-	 * @return int in milliseconds
+	 * @return int|null in milliseconds
 	 */
-	public function getTimestampUpdated(): int {
+	public function getTimestampUpdated() {
 		return $this->timestampUpdated;
 	}
 
 	/**
-	 * @return \DateTime
+	 * @return \DateTime|null
 	 */
-	public function getDateUpdated(): \DateTime {
-		return DateTimeUtils::createDateTimeFromTimestamp($this->timestampUpdated);
+	public function getDateUpdated() {
+		return $this->timestampUpdated === null ? null : DateTimeUtils::createDateTimeFromTimestamp($this->timestampUpdated);
 	}
 
 	/**
