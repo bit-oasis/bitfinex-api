@@ -5,8 +5,16 @@
         "react/promise": "^2.2",
         "react/event-loop": "~0.4",
         "ratchet/pawl": "^0.2.3|^0.3.1",
-        "psr/log": "^1.0"
+        "psr/log": "^1.0",
+        "bunny/bunny": "^0.5",
+        "foowie/react-mysql": "dev-master"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/foowie/react-mysql"
+        }
+    ],
     "authors": [
         {
             "name": "Daniel Robenek",
