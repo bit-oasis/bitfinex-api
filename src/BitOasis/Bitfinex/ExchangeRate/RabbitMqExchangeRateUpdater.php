@@ -22,7 +22,7 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 	const WEB_RPC_EXCHANGE = 'bitoasis.web-events';
 	const WEB_RPC_EXCHANGE_TYPE = 'direct';
 
-	/** @var int */
+	/** @var int|null */
 	protected $prefetchCount = 25;
 
 	/** @var ExchangeRateUpdateListener[] */
@@ -33,10 +33,11 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 	}
 
 	/**
+	 * @param int|null $prefetchCount NULL to not set RMQ QOS
 	 * @throws InvalidArgumentException
 	 */
-	public function setPrefetchCount(int $prefetchCount): void {
-		if ($prefetchCount < 1) {
+	public function setPrefetchCount($prefetchCount): void {
+		if ($prefetchCount !== null && $prefetchCount < 1) {
 			throw new InvalidArgumentException($prefetchCount . ' is not a valid prefetch count!');
 		}
 		$this->prefetchCount = $prefetchCount;
@@ -57,6 +58,10 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 				$bindings[] = $channel->queueBind('usd-exchange-rate.update', self::WEB_RPC_EXCHANGE, 'update');
 				return Promise\all($bindings);
 			})->then(function() use($channel) {
+				if ($this->prefetchCount === null) {
+					//Should return something, but the value is not used in next hanndler anyway...
+					return Promise\resolve();
+				}
 				return $channel->qos(0, $this->prefetchCount);
 			})->then(function() use($channel) {
 				$consumers = [];
@@ -76,7 +81,12 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 		}
 
 		$this->fireExchangeRateUpdated($data);
-		$channel->ack($message)->done();
+		$channel->ack($message)->done(
+			null,
+			function($e) {
+				\print_r($e);
+			}
+		);
 	}
 
 	protected function fireExchangeRateUpdated(array $data): void {
@@ -86,7 +96,15 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 		}
 
 		foreach ($this->exchangeRateUpdateListeners as $listener) {
-			$listener->onExchangeRateUpdated($data['currency'], $data['exchangeRate'], $data['timestamp']);
+			try {
+				$listener->onExchangeRateUpdated($data['currency'], $data['exchangeRate'], $data['timestamp']);
+			} catch (\Throwable $e) {
+				$loggerData = [
+					'class' => \get_class($listener),
+					'message' => $e->getMessage(),
+				];
+				$this->logger->error('Exchange rate update listener [{class}] thrown an exception: {message}', $loggerData);
+			}
 		}
 	}
 }

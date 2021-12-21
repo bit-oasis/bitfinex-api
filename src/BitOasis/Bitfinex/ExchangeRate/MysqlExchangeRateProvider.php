@@ -6,6 +6,7 @@ use BitOasis\Bitfinex\Exception\ExchangeRateNotFoundException;
 use Foowie\ReactMySql\Pool;
 use Foowie\ReactMySql\Result;
 use InvalidArgumentException;
+use Nette\Utils\DateTime;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -35,8 +36,8 @@ class MysqlExchangeRateProvider implements ExchangeRateProvider, ExchangeRateUpd
 	/** @var float[] associative array [currency => exchange_rate] */
 	private $cache;
 
-	/** @var float */
-	private $cacheLastUpdated;
+	/** @var DateTime[] */
+	private $exchangeRateLastUpdated;
 
 	public function __construct(Pool $pool, LoopInterface $loop) {
 		$this->pool = $pool;
@@ -59,6 +60,9 @@ class MysqlExchangeRateProvider implements ExchangeRateProvider, ExchangeRateUpd
 		$this->forceUpdateCache = $this->createForceUpdateCacheTimer();
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function getExchangeRate(string $currency): ExtendedPromiseInterface {
 		return $this->loadExchangeRates()
 			->then(function(array $exchangeRates) use($currency) {
@@ -70,13 +74,17 @@ class MysqlExchangeRateProvider implements ExchangeRateProvider, ExchangeRateUpd
 			});
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public function getExchangeRates(): ExtendedPromiseInterface {
 		return $this->loadExchangeRates();
 	}
 
 	public function onExchangeRateUpdated(string $currency, float $exchangeRate, float $timestamp): void {
-		if (($this->cacheLastUpdated ?? 0) <= $timestamp) {
-			$this->cacheLastUpdated = $timestamp;
+		$dateUpdated = DateTime::from($timestamp);
+		if (!isset($this->exchangeRateLastUpdated[$currency]) || $this->exchangeRateLastUpdated[$currency] <= $dateUpdated) {
+			$this->exchangeRateLastUpdated[$currency] = $dateUpdated;
 			$this->cache[$currency] = $exchangeRate;
 			$this->logger->info('USD exchange rate updated [{currency} - {rate}]', ['currency' => $currency, 'rate' => $exchangeRate]);
 		}
@@ -87,13 +95,14 @@ class MysqlExchangeRateProvider implements ExchangeRateProvider, ExchangeRateUpd
 			return Promise\resolve($this->cache);
 		}
 
-		return $this->pool->query('SELECT currency_id, exchange_rate FROM usd_exchange_rate')
+		return $this->pool->query('SELECT currency_id, exchange_rate, last_update FROM usd_exchange_rate')
 			->then(function(Result $result) {
 				$this->logger->debug('USD exchange rates loaded from DB');
-				$this->cacheLastUpdated = \microtime();
+				$this->exchangeRateLastUpdated = [];
 
 				foreach ($result->getResult() as $row) {
 					$this->cache[$row['currency_id']] = $row['exchange_rate'];
+					$this->exchangeRateLastUpdated[$row['currency_id']] = DateTime::from($row['last_update']);
 				}
 
 				return $this->cache;
