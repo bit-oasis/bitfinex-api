@@ -48,7 +48,14 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 	/** @var bool */
 	protected $lastStatusSentWasStarted = false;
 
-	public function __construct(string $symbol, string $precision = Precision::P0, string $frequency = Frequency::F0, int $length = 100, LoopInterface $loop) {
+	/**
+	 * @param string $symbol
+	 * @param string $precision Precision::P0
+	 * @param string $frequency Frequency::F0
+	 * @param int $length 100
+	 * @param LoopInterface $loop
+	 */
+	public function __construct(string $symbol, string $precision, string $frequency, int $length, LoopInterface $loop) {
 		parent::__construct($symbol);
 		$this->precision = $precision;
 		$this->frequency = $frequency;
