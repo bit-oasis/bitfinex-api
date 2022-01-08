@@ -11,7 +11,6 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
 use React\Promise;
 use React\Promise\ExtendedPromiseInterface;
 
@@ -27,7 +26,7 @@ class MysqlExchangeRateProvider implements ExchangeRateProvider, ExchangeRateUpd
 	/** @var LoopInterface */
 	protected $loop;
 
-	/** @var TimerInterface */
+	/** @var \React\EventLoop\Timer\TimerInterface|\React\EventLoop\TimerInterface */
 	protected $forceUpdateCache;
 
 	/** @var int [seconds] */
@@ -109,7 +108,10 @@ class MysqlExchangeRateProvider implements ExchangeRateProvider, ExchangeRateUpd
 			});
 	}
 
-	protected function createForceUpdateCacheTimer(): TimerInterface {
+	/**
+	 * @return \React\EventLoop\Timer\TimerInterface|\React\EventLoop\TimerInterface
+	 */
+	protected function createForceUpdateCacheTimer() {
 		return $this->loop->addPeriodicTimer($this->forceUpdateCacheInterval, function() {
 			$this->cache = null;
 		});

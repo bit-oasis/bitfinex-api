@@ -22,10 +22,13 @@ use React\Promise\PromiseInterface;
 /**
  * @author Daniel Robenek <daniel.robenek@me.com>
  */
-class BitfinexWebsocket implements LoggerAwareInterface {
-	use LoggerAwareTrait;
+class BitfinexWebsocket /*implements LoggerAwareInterface*/ {
+	/*use LoggerAwareTrait;*/
 
 	const WEBSOCKET_URL = 'wss://api.bitfinex.com/ws/2';
+
+	/** @var LoggerInterface */
+	protected $logger;
 
 	/** @var AuthenticatedChannel */
 	protected $authChannel;
