@@ -7,15 +7,12 @@ use BitOasis\Bitfinex\Exception\CannotAddSubscriberException;
 use BitOasis\Bitfinex\Websocket\Channel\Authenticated\AuthenticatedChannel;
 use BitOasis\Bitfinex\Websocket\Channel\Authenticated\AuthenticatedSubchannel;
 use Nette\Utils\Json;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\MessageInterface;
 use React\EventLoop\LoopInterface;
-use React\EventLoop\Timer\TimerInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 
@@ -48,13 +45,13 @@ class BitfinexWebsocket /*implements LoggerAwareInterface*/ {
 	/** @var Deferred|null */
 	protected $closeDeferred;
 
-	/** @var TimerInterface|null */
+	/** @var \React\EventLoop\Timer\TimerInterface|\React\EventLoop\TimerInterface|null */
 	protected $reconnectTimer;
 
 	/** @var bool */
 	protected $reconnectOnError = true;
 
-	public function __construct(string $apiKey = null, string $apiSecret = null, LoopInterface $loop) {
+	public function __construct(string $apiKey, string $apiSecret, LoopInterface $loop) {
 		$this->authChannel = new AuthenticatedChannel($apiKey, $apiSecret, $loop);
 		$this->subscribers[] = $this->authChannel;
 		$this->loop = $loop;
@@ -194,7 +191,11 @@ class BitfinexWebsocket /*implements LoggerAwareInterface*/ {
 
 	public function close(): PromiseInterface {
 		if ($this->reconnectTimer !== null) {
-			$this->reconnectTimer->cancel();
+			if (method_exists($this->reconnectTimer, 'cancel')) {
+				$this->reconnectTimer->cancel();
+			} else {
+				\React\EventLoop\Loop::get()->cancelTimer($this->reconnectTimer);
+			}
 			$this->reconnectTimer = null;
 		}
 		if (!$this->isRunning()) {

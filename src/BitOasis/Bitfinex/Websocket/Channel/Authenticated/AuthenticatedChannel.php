@@ -49,7 +49,7 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 	/** @var bool */
 	protected $lastStatusSentWasStarted = false;
 
-	public function __construct(string $apiKey = null, string $apiSecret = null, LoopInterface $loop) {
+	public function __construct(string $apiKey, string $apiSecret, LoopInterface $loop) {
 		$this->apiKey = $apiKey;
 		$this->apiSecret = $apiSecret;
 		$this->hb = new HeartBeat([$this, 'onHeartBeatFailure'], [$this, 'onHeartBeatResumed'], $loop);

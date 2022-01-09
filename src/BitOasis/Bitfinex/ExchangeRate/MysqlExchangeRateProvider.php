@@ -30,10 +30,13 @@ class MysqlExchangeRateProvider implements ExchangeRateProvider, ExchangeRateUpd
 	protected $forceUpdateCache;
 
 	/** @var int [seconds] */
-	protected $forceUpdateCacheInterval = 60;
+	protected $forceUpdateCacheInterval = 30;
 
 	/** @var float[] associative array [currency => exchange_rate] */
 	private $cache;
+
+	/** @var Promise\Deferred|null */
+	private $deferred;
 
 	/** @var DateTime[] */
 	private $exchangeRateLastUpdated;
@@ -55,7 +58,11 @@ class MysqlExchangeRateProvider implements ExchangeRateProvider, ExchangeRateUpd
 		}
 
 		$this->forceUpdateCacheInterval = $forceUpdateCacheInterval;
-		$this->forceUpdateCache->cancel();
+		if (method_exists($this->forceUpdateCache, 'cancel')) {
+			$this->forceUpdateCache->cancel();
+		} else {
+			\React\EventLoop\Loop::get()->cancelTimer($this->forceUpdateCache);
+		}
 		$this->forceUpdateCache = $this->createForceUpdateCacheTimer();
 	}
 
@@ -94,7 +101,12 @@ class MysqlExchangeRateProvider implements ExchangeRateProvider, ExchangeRateUpd
 			return Promise\resolve($this->cache);
 		}
 
-		return $this->pool->query('SELECT currency_id, exchange_rate, last_update FROM usd_exchange_rate')
+		if ($this->deferred !== null) {
+			return $this->deferred->promise();
+		}
+
+		$this->deferred = new Promise\Deferred();
+		$this->pool->query('SELECT currency_id, exchange_rate, last_update FROM usd_exchange_rate')
 			->then(function(Result $result) {
 				$this->logger->debug('USD exchange rates loaded from DB');
 				$this->exchangeRateLastUpdated = [];
@@ -103,9 +115,12 @@ class MysqlExchangeRateProvider implements ExchangeRateProvider, ExchangeRateUpd
 					$this->cache[$row['currency_id']] = $row['exchange_rate'];
 					$this->exchangeRateLastUpdated[$row['currency_id']] = DateTime::from($row['last_update']);
 				}
-
-				return $this->cache;
+			})->done(function() {
+				$this->deferred->resolve($this->cache);
+				$this->deferred = null;
 			});
+
+		return $this->deferred->promise();
 	}
 
 	/**
