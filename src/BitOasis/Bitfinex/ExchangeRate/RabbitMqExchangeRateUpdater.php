@@ -19,11 +19,15 @@ use React\Promise\PromiseInterface;
 class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 	use LoggerAwareTrait;
 
-	const WEB_RPC_EXCHANGE = 'bitoasis.web-events';
+	const WEB_RPC_EXCHANGE = 'bitoasis.fiat-rates';
 	const WEB_RPC_EXCHANGE_TYPE = 'direct';
+	const WEB_RPC_QUEUE_NAME = 'usd-exchange-rate.update';
 
 	/** @var int|null */
 	protected $prefetchCount = 25;
+
+	/** @var string */
+	protected $queuePostfix = '';
 
 	/** @var ExchangeRateUpdateListener[] */
 	protected $exchangeRateUpdateListeners = [];
@@ -47,25 +51,30 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 		$this->exchangeRateUpdateListeners[] = $listener;
 	}
 
+	public function setQueuePostfix(string $queuePostfix) {
+		$this->queuePostfix = $queuePostfix;
+	}
+
 	public function initializeMq(Channel $channel): PromiseInterface {
+		$queueName = $this->getQueueName();
 		return $channel->exchangeDeclare(self::WEB_RPC_EXCHANGE, self::WEB_RPC_EXCHANGE_TYPE, false, true)
-			->then(function() use($channel) {
+			->then(function() use($channel, $queueName) {
 				$queues = [];
-				$queues[] = $channel->queueDeclare('usd-exchange-rate.update', false, true);
+				$queues[] = $channel->queueDeclare($queueName, false, true);
 				return Promise\all($queues);
-			})->then(function() use($channel) {
+			})->then(function() use($channel, $queueName) {
 				$bindings = [];
-				$bindings[] = $channel->queueBind('usd-exchange-rate.update', self::WEB_RPC_EXCHANGE, 'update');
+				$bindings[] = $channel->queueBind($queueName, self::WEB_RPC_EXCHANGE, 'update');
 				return Promise\all($bindings);
-			})->then(function() use($channel) {
+			})->then(function() use($channel, $queueName) {
 				if ($this->prefetchCount === null) {
 					//Should return something, but the value is not used in next hanndler anyway...
 					return Promise\resolve();
 				}
 				return $channel->qos(0, $this->prefetchCount);
-			})->then(function() use($channel) {
+			})->then(function() use($channel, $queueName) {
 				$consumers = [];
-				$consumers[] = $channel->consume([$this, 'updateExchangeRate'], 'usd-exchange-rate.update', 'usd-exchange-rate.update');
+				$consumers[] = $channel->consume([$this, 'updateExchangeRate'], $queueName, $queueName);
 				return Promise\all($consumers);
 			})->then(function() {
 				$this->logger->info('RabbitMQ {type} exchange {exchange} declared', ['exchange' => self::WEB_RPC_EXCHANGE, 'type' => self::WEB_RPC_EXCHANGE_TYPE]);
@@ -106,5 +115,9 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 				$this->logger->error('Exchange rate update listener [{class}] thrown an exception: {message}', $loggerData);
 			}
 		}
+	}
+
+	protected function getQueueName(): string {
+		return self::WEB_RPC_QUEUE_NAME . '.' . $this->queuePostfix;
 	}
 }
