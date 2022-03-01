@@ -19,9 +19,9 @@ use React\Promise\PromiseInterface;
 class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 	use LoggerAwareTrait;
 
-	const WEB_RPC_EXCHANGE = 'bitoasis.fiat-rates';
-	const WEB_RPC_EXCHANGE_TYPE = 'direct';
-	const WEB_RPC_QUEUE_NAME = 'usd-exchange-rate.update';
+	const FIAT_RATES_EXCHANGE = 'bitoasis.fiat-rates';
+	const FIAT_RATES_EXCHANGE_TYPE = 'direct';
+	const FIAT_RATES_QUEUE_NAME = 'usd-exchange-rate.update';
 
 	/** @var int|null */
 	protected $prefetchCount = 25;
@@ -57,14 +57,14 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 
 	public function initializeMq(Channel $channel): PromiseInterface {
 		$queueName = $this->getQueueName();
-		return $channel->exchangeDeclare(self::WEB_RPC_EXCHANGE, self::WEB_RPC_EXCHANGE_TYPE, false, true)
+		return $channel->exchangeDeclare(self::FIAT_RATES_EXCHANGE, self::FIAT_RATES_EXCHANGE_TYPE, false, true)
 			->then(function() use($channel, $queueName) {
 				$queues = [];
 				$queues[] = $channel->queueDeclare($queueName, false, true);
 				return Promise\all($queues);
 			})->then(function() use($channel, $queueName) {
 				$bindings = [];
-				$bindings[] = $channel->queueBind($queueName, self::WEB_RPC_EXCHANGE, 'update');
+				$bindings[] = $channel->queueBind($queueName, self::FIAT_RATES_EXCHANGE, 'update');
 				return Promise\all($bindings);
 			})->then(function() use($channel, $queueName) {
 				if ($this->prefetchCount === null) {
@@ -74,10 +74,10 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 				return $channel->qos(0, $this->prefetchCount);
 			})->then(function() use($channel, $queueName) {
 				$consumers = [];
-				$consumers[] = $channel->consume([$this, 'updateExchangeRate'], $queueName, $queueName);
+				$consumers[] = $channel->consume([$this, 'updateExchangeRate'], $queueName);
 				return Promise\all($consumers);
 			})->then(function() {
-				$this->logger->info('RabbitMQ {type} exchange {exchange} declared', ['exchange' => self::WEB_RPC_EXCHANGE, 'type' => self::WEB_RPC_EXCHANGE_TYPE]);
+				$this->logger->info('RabbitMQ {type} exchange {exchange} declared', ['exchange' => self::FIAT_RATES_EXCHANGE, 'type' => self::FIAT_RATES_EXCHANGE_TYPE]);
 			});
 	}
 
@@ -118,6 +118,6 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 	}
 
 	protected function getQueueName(): string {
-		return self::WEB_RPC_QUEUE_NAME . '.' . $this->queuePostfix;
+		return self::FIAT_RATES_QUEUE_NAME . '.' . $this->queuePostfix;
 	}
 }
