@@ -2,6 +2,7 @@
 
 namespace BitOasis\Bitfinex\ExchangeRate;
 
+use BitOasis\Bitfinex\Exception\CannotAddListenerException;
 use Bunny\Channel;
 use Bunny\Message;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
@@ -32,6 +33,9 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 	/** @var string[] */
 	protected $routingKeys = [];
 
+	/** @var bool */
+	protected $running = false;
+
 	public function __construct() {
 		$this->logger = new NullLogger();
 	}
@@ -51,7 +55,16 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 		$this->exchangeRateUpdateListeners[] = $listener;
 	}
 
-	public function addRoutingKey(string $routingKey): void {
+	/**
+	 * @throws CannotAddListenerException
+	 */
+	public function requestUpdatesForCurrency(string $bitOasisCurrency): void {
+		if ($this->running) {
+			throw new CannotAddListenerException('Cannot request an updates after starting a RMQ service.');
+		}
+
+		$routingKey = strtoupper($bitOasisCurrency);
+
 		if (!isset($this->routingKeys[$routingKey])) {
 			$this->routingKeys[$routingKey] = $routingKey;
 		}
@@ -80,6 +93,7 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 				$consumers[] = $channel->consume([$this, 'updateExchangeRate'], $queueName);
 				return Promise\all($consumers);
 			})->then(function() {
+				$this->running = true;
 				$this->logger->info('RabbitMQ {type} exchange {exchange} declared', ['exchange' => self::FIAT_RATES_EXCHANGE, 'type' => self::FIAT_RATES_EXCHANGE_TYPE]);
 			});
 	}
