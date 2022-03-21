@@ -63,7 +63,7 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 			throw new CannotAddListenerException('Cannot request an updates after starting a RMQ service.');
 		}
 
-		$routingKey = strtoupper($bitOasisCurrency);
+		$routingKey = strtolower($bitOasisCurrency);
 
 		if (!isset($this->routingKeys[$routingKey])) {
 			$this->routingKeys[$routingKey] = $routingKey;
