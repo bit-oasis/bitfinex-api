@@ -1,13 +1,15 @@
 {
     "name": "bit-oasis/bitfinex-api",
     "require": {
-        "nette/utils": "^2.4",
+        "php": ">=7.1",
+        "ext-json": "*",
+        "nette/utils": "^2.4|^3.2",
         "react/promise": "^2.2",
-        "react/event-loop": "~0.4",
-        "ratchet/pawl": "^0.2.3|^0.3.1",
-        "psr/log": "^1.0",
+        "react/event-loop": "~0.4|~1.2",
+        "ratchet/pawl": "^0.2.3|^0.3.1|^0.4",
+        "psr/log": "^1.0|^3.0",
         "bunny/bunny": "^0.5",
-        "foowie/react-mysql": "dev-master"
+        "foowie/react-mysql": ">=1.1.0"
     },
     "repositories": [
         {
