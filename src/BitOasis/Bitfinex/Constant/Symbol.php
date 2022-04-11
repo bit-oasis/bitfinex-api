@@ -73,6 +73,25 @@ final class Symbol {
 	const TUDCUSD = 'tUDCUSD';
 	const TWAVESUSD = 'tWAVES:USD';
 	const TWAVESUST = 'tWAVES:UST';
+	const TSOLUSD = 'tSOLUSD';
+	const TSOLUST = 'tSOLUST';
+	const TADAUSD = 'tADAUSD';
+	const TADAUST = 'tADAUST';
+	const TDOTUSD = 'tDOTUSD';
+	const TDOTUST = 'tDOTUST';
+	const TSHIBUSD = 'tSHIB:USD';
+	const TSHIBUST = 'tSHIB:UST';
+	const TAVAXUSD = 'tAVAX:USD';
+	const TAVAXUST = 'tAVAX:UST';
+	const TLUNAUSD = 'tLUNA:USD';
+	const TLUNAUST = 'tLUNA:UST';
+	const TNEARUSD = 'tNEAR:USD';
+	const TNEARUST = 'tNEAR:UST';
+	const TFTMUSD = 'tFTMUSD';
+	const TFTMUST = 'tFTMUST';
+	const TWBTUSD = 'tWBTUSD';
+	const TATOUSD = 'tATOUSD';
+	const TATOUST = 'tATOUST';
 
 	public static function isTrading(string $symbol): bool {
 	    return $symbol !== '' && $symbol[0] === 't';

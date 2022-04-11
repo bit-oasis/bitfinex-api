@@ -2,8 +2,10 @@
 
 namespace BitOasis\Bitfinex\ExchangeRate;
 
+use BitOasis\Bitfinex\Exception\CannotAddListenerException;
 use Bunny\Channel;
 use Bunny\Message;
+use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use InvalidArgumentException;
 use Nette\Utils\Json;
 use Nette\Utils\JsonException;
@@ -19,14 +21,20 @@ use React\Promise\PromiseInterface;
 class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 	use LoggerAwareTrait;
 
-	const WEB_RPC_EXCHANGE = 'bitoasis.web-events';
-	const WEB_RPC_EXCHANGE_TYPE = 'direct';
+	const FIAT_RATES_EXCHANGE = 'bitoasis.fiat-rates';
+	const FIAT_RATES_EXCHANGE_TYPE = 'direct';
 
 	/** @var int|null */
 	protected $prefetchCount = 25;
 
 	/** @var ExchangeRateUpdateListener[] */
 	protected $exchangeRateUpdateListeners = [];
+
+	/** @var string[] */
+	protected $routingKeys = [];
+
+	/** @var bool */
+	protected $running = false;
 
 	public function __construct() {
 		$this->logger = new NullLogger();
@@ -47,15 +55,32 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 		$this->exchangeRateUpdateListeners[] = $listener;
 	}
 
+	/**
+	 * @throws CannotAddListenerException
+	 */
+	public function requestUpdatesForCurrency(string $bitOasisCurrency): void {
+		if ($this->running) {
+			throw new CannotAddListenerException('Cannot request an updates after starting a RMQ service.');
+		}
+
+		$routingKey = strtolower($bitOasisCurrency);
+
+		if (!isset($this->routingKeys[$routingKey])) {
+			$this->routingKeys[$routingKey] = $routingKey;
+		}
+	}
+
 	public function initializeMq(Channel $channel): PromiseInterface {
-		return $channel->exchangeDeclare(self::WEB_RPC_EXCHANGE, self::WEB_RPC_EXCHANGE_TYPE, false, true)
+		$queueName = null;
+		return $channel->exchangeDeclare(self::FIAT_RATES_EXCHANGE, self::FIAT_RATES_EXCHANGE_TYPE)
 			->then(function() use($channel) {
-				$queues = [];
-				$queues[] = $channel->queueDeclare('usd-exchange-rate.update', false, true);
-				return Promise\all($queues);
-			})->then(function() use($channel) {
+				return $channel->queueDeclare('', false, false, true);
+			})->then(function(MethodQueueDeclareOkFrame $queueDeclareReply) use ($channel, &$queueName) {
+				$queueName = $queueDeclareReply->queue;
 				$bindings = [];
-				$bindings[] = $channel->queueBind('usd-exchange-rate.update', self::WEB_RPC_EXCHANGE, 'update');
+				foreach ($this->routingKeys as $routingKey) {
+					$bindings[] = $channel->queueBind($queueName, self::FIAT_RATES_EXCHANGE, $routingKey);
+				}
 				return Promise\all($bindings);
 			})->then(function() use($channel) {
 				if ($this->prefetchCount === null) {
@@ -63,12 +88,13 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 					return Promise\resolve();
 				}
 				return $channel->qos(0, $this->prefetchCount);
-			})->then(function() use($channel) {
+			})->then(function() use($channel, &$queueName) {
 				$consumers = [];
-				$consumers[] = $channel->consume([$this, 'updateExchangeRate'], 'usd-exchange-rate.update', 'usd-exchange-rate.update');
+				$consumers[] = $channel->consume([$this, 'updateExchangeRate'], $queueName);
 				return Promise\all($consumers);
 			})->then(function() {
-				$this->logger->info('RabbitMQ {type} exchange {exchange} declared', ['exchange' => self::WEB_RPC_EXCHANGE, 'type' => self::WEB_RPC_EXCHANGE_TYPE]);
+				$this->running = true;
+				$this->logger->info('RabbitMQ {type} exchange {exchange} declared', ['exchange' => self::FIAT_RATES_EXCHANGE, 'type' => self::FIAT_RATES_EXCHANGE_TYPE]);
 			});
 	}
 
