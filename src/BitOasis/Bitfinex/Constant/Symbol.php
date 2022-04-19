@@ -102,7 +102,7 @@ final class Symbol {
 	const TAXSUSD = 'tAXSUSD';
 	const TAXSUST = 'tAXSUST';
 	const TBANDUSD = 'tBAND:USD';
-	const TBANDUST = 'tBAND::UST';
+	const TBANDUST = 'tBAND:UST';
 	const TCHZUSD = 'tCHZUSD';
 	const TCHZUST = 'tCHZUST';
 	const TCRVUSD = 'tCRVUSD';
@@ -114,8 +114,8 @@ final class Symbol {
 	const TFILUST = 'tFILUST';
 	const TFTTUSD = 'tFTTUSD';
 	const TFTTUST = 'tFTTUST';
-	const TGALAUSD = 'tGALA::USD';
-	const TGALAUST = 'tGALA::UST';
+	const TGALAUSD = 'tGALA:USD';
+	const TGALAUST = 'tGALA:UST';
 	const TGNOUSD = 'tGNOUSD';
 	const TGRTUSD = 'tGRTUSD';
 	const TGRTUST = 'tGRTUST';
@@ -128,11 +128,11 @@ final class Symbol {
 	const TLEOUST = 'tLEOUST';
 	const TLEOBTC = 'tLEOBTC';
 	const TLEOETH = 'tLEOETH';
-	const TNEXOUSD = 'tNEXO::USD';
-	const TNEXOUST = 'tNEXO::UST';
-	const TNEXOBTC = 'tNEXO::BTC';
-	const TOCEANUSD = 'tOCEAN::USD';
-	const TOCEANUST = 'tOCEAN::UST';
+	const TNEXOUSD = 'tNEXO:USD';
+	const TNEXOUST = 'tNEXO:UST';
+	const TNEXOBTC = 'tNEXO:BTC';
+	const TOCEANUSD = 'tOCEAN:USD';
+	const TOCEANUST = 'tOCEAN:UST';
 	const TQTMUSD = 'tQTMUSD';
 	const TQTMBTC = 'tQTMBTC';
 	const TSNXUSD = 'tSNXUSD';
