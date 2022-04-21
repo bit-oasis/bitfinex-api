@@ -7,6 +7,7 @@ use InvalidArgumentException;
 
 /**
  * @author David Fiedor <davefu@seznam.cz>
+ * @deprecated
  */
 class ConsoleUtils {
 	

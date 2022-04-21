@@ -93,8 +93,6 @@ final class Symbol {
 	const TATOUST = 'tATOUST';
 	const T1INCHUSD = 't1INCH:USD';
 	const T1INCHUST = 't1INCH:UST';
-	const TAMPLUSD = 'tAMPUSD';
-	const TAMPLUST = 'tAMPUST';
 	const TAMPBTC = 'tAMPBTC';
 	const TANTUSD = 'tANTUSD';
 	const TANTBTC = 'tANTBTC';
