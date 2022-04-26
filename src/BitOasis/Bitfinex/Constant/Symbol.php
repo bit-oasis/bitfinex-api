@@ -56,7 +56,6 @@ final class Symbol {
 	const TYFIUSD = 'tYFIUSD';
 	const TBALUSD = 'tBALUSD';
 	const TCOMPUSD = 'tCOMP:USD';
-	const TSNXUSD = 'tSNXUSD';
 	const TDOGEUSD = 'tDOGE:USD';
 	const TDOGEUST = 'tDOGE:UST';
 	const TAAVEUSD = 'tAAVE:USD';
@@ -92,9 +91,67 @@ final class Symbol {
 	const TWBTUSD = 'tWBTUSD';
 	const TATOUSD = 'tATOUSD';
 	const TATOUST = 'tATOUST';
+	const T1INCHUSD = 't1INCH:USD';
+	const T1INCHUST = 't1INCH:UST';
+	const TAMPBTC = 'tAMPBTC';
+	const TANTUSD = 'tANTUSD';
+	const TANTBTC = 'tANTBTC';
+	const TANTETH = 'tANTETH';
+	const TAXSUSD = 'tAXSUSD';
+	const TAXSUST = 'tAXSUST';
+	const TBANDUSD = 'tBAND:USD';
+	const TBANDUST = 'tBAND:UST';
+	const TCHZUSD = 'tCHZUSD';
+	const TCHZUST = 'tCHZUST';
+	const TCRVUSD = 'tCRVUSD';
+	const TCRVUST = 'tCRVUST';
+	const TDGBUSD = 'tDGBUSD';
+	const TEGLDUSD = 'tEGLD:USD';
+	const TEGLDUST = 'tEGLD:UST';
+	const TFILUSD = 'tFILUSD';
+	const TFILUST = 'tFILUST';
+	const TFTTUSD = 'tFTTUSD';
+	const TFTTUST = 'tFTTUST';
+	const TGALAUSD = 'tGALA:USD';
+	const TGALAUST = 'tGALA:UST';
+	const TGNOUSD = 'tGNOUSD';
+	const TGRTUSD = 'tGRTUSD';
+	const TGRTUST = 'tGRTUST';
+	const TIOTUSD = 'tIOTUSD';
+	const TIOTBTC = 'tIOTBTC';
+	const TIOTETH = 'tIOTETH';
+	const TKSMUSD = 'tKSMUSD';
+	const TKSMUST = 'tKSMUST';
+	const TLEOUSD = 'tLEOUSD';
+	const TLEOUST = 'tLEOUST';
+	const TLEOBTC = 'tLEOBTC';
+	const TLEOETH = 'tLEOETH';
+	const TNEXOUSD = 'tNEXO:USD';
+	const TNEXOUST = 'tNEXO:UST';
+	const TNEXOBTC = 'tNEXO:BTC';
+	const TOCEANUSD = 'tOCEAN:USD';
+	const TOCEANUST = 'tOCEAN:UST';
+	const TQTMUSD = 'tQTMUSD';
+	const TQTMBTC = 'tQTMBTC';
+	const TSNXUSD = 'tSNXUSD';
+	const TSNXUST = 'tSNXUST';
+	const TTHEATAUSD = 'tTHETA:USD';
+	const TTHEATAUST = 'tTHETA:UST';
+	const TTRXUSD = 'tTRXUSD';
+	const TTRXUST = 'tTRXUST';
+	const TTRXBTC = 'tTRXBTC';
+	const TTRXETH = 'tTRXETH';
+	const TTUSDUSD = 'tTSDUSD';
+	const TTUSDUST = 'tTSDUST';
+	const TTERRAUSTUSD = 'tTERRAUST:USD';
+	const TTERRAUSTUST = 'tTERRAUST:UST';
+	const TVETUSD = 'tVETUSD';
+	const TVETUST = 'tVETUST';
+	const TVETBTC = 'tVETBTC';
+	const TXVGUSD = 'tXVGUSD';
 
 	public static function isTrading(string $symbol): bool {
-	    return $symbol !== '' && $symbol[0] === 't';
+		return $symbol !== '' && $symbol[0] === 't';
 	}
 
 }
