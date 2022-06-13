@@ -23,7 +23,6 @@ final class Symbol {
 	const TXMRUSD = 'tXMRUSD';
 	const TXLMUSD = 'tXLMUSD';
 	const TXLMBTC = 'tXLMBTC';
-	const TXLMETH = 'tXLMETH';
 	const TXLMUST = 'tXLMUST';
 	const TBCHUSD = 'tBCHN:USD';
 	const TBCHBTC = 'tBCHN:BTC';
@@ -51,7 +50,6 @@ final class Symbol {
 	const TETHUST = 'tETHUST';
 	const TNEOUSD = 'tNEOUSD';
 	const TNEOBTC = 'tNEOBTC';
-	const TNEOETH = 'tNEOETH';
 	const TNEOUST = 'tNEOUST';
 	const TXTZUSD = 'tXTZUSD';
 	const TXTZBTC = 'tXTZBTC';
