@@ -179,6 +179,8 @@ final class Symbol {
 	const TLINKUST = 'tLINK:UST';
 	const TLUNA2USD = 'tLUNA2:USD';
 	const TLUNA2UST = 'tLUNA2:UST';
+	const TETHWUSD = 'tETHW:USD';
+	const TETHWUST = 'tETHW:UST';
 
 	public static function isTrading(string $symbol): bool {
 		return $symbol !== '' && $symbol[0] === 't';
