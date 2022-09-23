@@ -11,6 +11,7 @@ final class Symbol {
 	const TETHUSD = 'tETHUSD';
 	const TETCUSD = 'tETCUSD';
 	const TETCBTC = 'tETCBTC';
+	const TETCUST = 'tETCUST';
 	const TETHBTC = 'tETHBTC';
 	const TXRPBTC = 'tXRPBTC';
 	const TXRPUSD = 'tXRPUSD';
