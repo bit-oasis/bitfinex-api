@@ -292,10 +292,37 @@ class OrderMessage {
 	}
 
 	/**
+	 * For multi-trade orders status will contain all the historical statuses, and will be
+	 * truncated from the beginning, e.g.
+	 * "(-41.37139577), PARTIALLY FILLED @ 12.58(-15.53), PARTIALLY FILLED @ 12.58(-41.34952975), PARTIALLY FILLED @ 12.58(-41.34340231)"
+	 *
+	 * The real status will be the last one (comma separated sections) => PARTIALLY FILLED @ 12.58(-41.34340231)
+	 *
+	 * In Case of partial order got Executed or Canceled
+	 * We will receive status the actual status from beginning: e.g. CANCELED was:  12.58(-15.53), PARTIALLY FILLED @ 12.58(-41.34952975), PARTIALLY FILLED @ 12.58(-41.34340231), PARTIALLY FILLED @ 12.58(-15.71)
+	 *
 	 * @return bool
 	 */
 	public function isStatusPartiallyFilled(): bool {
-		return 0 === strpos($this->orderStatus, 'PARTIALLY FILLED');
+		$status = $this->orderStatus;
+
+		if ($this->remainingAmount === 0.0 || $this->remainingAmount === $this->originalAmount) {
+			return false;
+		}
+
+		if (
+			0 === strpos($status, 'ACTIVE') ||
+			0 === strpos($status, 'CANCELED') ||
+			0 === strpos($status, 'EXECUTED') ||
+			0 === strpos($status, 'INSUFFICIENT MARGIN') ||
+			0 === strpos($status, 'RSN_BOOK_SLIP')
+		) {
+			return false;
+		}
+
+		$sections = explode(', ', $status);
+
+		return 0 === strpos(end($sections), 'PARTIALLY FILLED');
 	}
 
 	/**
