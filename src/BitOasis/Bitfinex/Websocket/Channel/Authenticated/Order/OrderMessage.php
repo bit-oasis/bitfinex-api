@@ -67,7 +67,10 @@ class OrderMessage {
 	/** @var int|null */
 	protected $placedId;
 
-	public function __construct(int $id, /*?int */$gid, int $cid, string $symbol, int $timestampCreated, /*?int */ $timestampUpdated, float $remainingAmount, float $originalAmount, string $type, /*?string */$previousType, string $orderStatus, float $price, float $avgPrice, /*?float */$trailingPrice, /*?float */$auxLimitPrice, bool $notify, bool $hidden, int $placedId = null) {
+	/** @var array */
+	protected $meta;
+
+	public function __construct(int $id, /*?int */$gid, int $cid, string $symbol, int $timestampCreated, /*?int */ $timestampUpdated, float $remainingAmount, float $originalAmount, string $type, /*?string */$previousType, string $orderStatus, float $price, float $avgPrice, /*?float */$trailingPrice, /*?float */$auxLimitPrice, bool $notify, bool $hidden, int $placedId = null, array $meta = []) {
 		$this->id = $id;
 		$this->gid = $gid;
 		$this->cid = $cid;
@@ -86,6 +89,7 @@ class OrderMessage {
 		$this->notify = $notify;
 		$this->hidden = $hidden;
 		$this->placedId = $placedId;
+		$this->meta = $meta;
 	}
 
 	/**
@@ -112,7 +116,8 @@ class OrderMessage {
 			$data[19],
 			$data[23],
 			$data[24],
-			$data[25]
+			$data[25],
+			$data[31]
 		);
 	}
 
@@ -268,6 +273,13 @@ class OrderMessage {
 	 */
 	public function getPlacedId() {
 		return $this->placedId;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getMeta(): array {
+		return $this->meta;
 	}
 
 	/**
