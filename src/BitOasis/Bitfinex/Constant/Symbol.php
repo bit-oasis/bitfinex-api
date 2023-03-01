@@ -38,6 +38,8 @@ final class Symbol {
 	const TOMGBTC = 'tOMGBTC';
 	const TOMGETH = 'tOMGETH';
 	const TZRXUSD = 'tZRXUSD';
+	const TZRXBTC = 'tZRXBTC';
+	const TZRXETH = 'tZRXETH';
 	const TBATUSD = 'tBATUSD';
 	const TBATBTC = 'tBATBTC';
 	const TBATUST = 'tBATUST';
@@ -55,6 +57,7 @@ final class Symbol {
 	const TXTZUST = 'tXTZUST';
 	const TDAIUSD = 'tDAIUSD';
 	const TDAIBTC = 'tDAIBTC';
+	const TDAIETH = 'tDAIETH';
 	const TMKRUSD = 'tMKRUSD';
 	const TMKRBTC = 'tMKRBTC';
 	const TMKRUST = 'tMKRUST';
@@ -143,6 +146,7 @@ final class Symbol {
 	const TGRTUST = 'tGRTUST';
 	const TIOTUSD = 'tIOTUSD';
 	const TIOTBTC = 'tIOTBTC';
+	const TIOTETH = 'tIOTETH';
 	const TKSMUSD = 'tKSMUSD';
 	const TKSMUST = 'tKSMUST';
 	const TLEOUSD = 'tLEOUSD';

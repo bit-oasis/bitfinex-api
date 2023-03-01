@@ -78,6 +78,9 @@ class RabbitMqExchangeRateUpdater implements LoggerAwareInterface {
 			})->then(function(MethodQueueDeclareOkFrame $queueDeclareReply) use ($channel, &$queueName) {
 				$queueName = $queueDeclareReply->queue;
 				$bindings = [];
+				foreach ($this->routingKeys as $routingKey) {
+					$bindings[] = $channel->queueBind($queueName, self::FIAT_RATES_EXCHANGE, $routingKey);
+				}
 				return Promise\all($bindings);
 			})->then(function() use($channel) {
 				if ($this->prefetchCount === null) {
