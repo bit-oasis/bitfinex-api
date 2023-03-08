@@ -184,6 +184,7 @@ final class Symbol {
 	const TETHWUST = 'tETHW:UST';
 	const TXAUTUSD = 'tXAUT:USD';
 	const TXAUTUST = 'tXAUT:UST';
+	const TXAUTBTC = 'tXAUT:BTC';
 
 	public static function isTrading(string $symbol): bool {
 		return $symbol !== '' && $symbol[0] === 't';
