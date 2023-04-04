@@ -117,7 +117,7 @@ class OrderMessage {
 			$data[23],
 			$data[24],
 			$data[25],
-			$data[31]
+			$data[31] ?? []
 		);
 	}
 
