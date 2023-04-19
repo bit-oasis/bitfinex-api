@@ -9,6 +9,10 @@ use BitOasis\Bitfinex\Exception\OperationFailedException;
  */
 class NewOrder implements Operation {
 
+	/** @see https://docs.bitfinex.com/docs/flag-values */
+	/** @var int */
+	protected const FLAG_VALUE_OCO = 16384;
+
 	/** @var int|null */
 	protected $gid;
 
@@ -32,6 +36,9 @@ class NewOrder implements Operation {
 
 	/** @var float|null */
 	protected $priceAuxLimit;
+
+	/** @var float|null */
+	protected $priceOcoStop;
 
 	/** @var bool|null */
 	protected $hidden;
@@ -75,6 +82,13 @@ class NewOrder implements Operation {
 	}
 
 	/**
+	 * @param float $priceOcoStop
+	 */
+	public function setPriceOcoStop(float $priceOcoStop) {
+		$this->priceOcoStop = $priceOcoStop;
+	}
+
+	/**
 	 * @param bool|null $hidden
 	 */
 	public function setHidden(bool $hidden = true) {
@@ -94,6 +108,7 @@ class NewOrder implements Operation {
 	}
 
 	public function getOperationData(): array {
+		$flags = 0;
 		$data = [
 			'cid' => $this->cid,
 			'type' => $this->type,
@@ -112,6 +127,10 @@ class NewOrder implements Operation {
 		if ($this->priceAuxLimit !== null) {
 			$data['price_aux_limit'] = (string)$this->priceAuxLimit;
 		}
+		if ($this->priceOcoStop !== null) {
+			$flags += self::FLAG_VALUE_OCO;
+			$data['price_oco_stop'] = (string)$this->priceOcoStop;
+		}
 		if ($this->hidden !== null) {
 			$data['hidden'] = $this->hidden ? 1 : 0;
 		}
@@ -120,6 +139,10 @@ class NewOrder implements Operation {
 		}
 		if (!empty($this->meta)) {
 			$data['meta'] = $this->meta;
+		}
+
+		if ($flags > 0) {
+			$data['flags'] = $flags;
 		}
 		return $data;
 	}
