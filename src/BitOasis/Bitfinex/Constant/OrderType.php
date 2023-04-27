@@ -19,5 +19,7 @@ class OrderType {
 	const EXCHANGE_FOK = 'EXCHANGE FOK';
 	const STOP_LIMIT = 'STOP LIMIT';
 	const EXCHANGE_STOP_LIMIT = 'EXCHANGE STOP LIMIT';
+	const IOC = 'IOC';
+	const EXCHANGE_IOC = 'EXCHANGE IOC';
 
 }
