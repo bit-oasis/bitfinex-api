@@ -23,6 +23,7 @@ class BitfinexWebsocket /*implements LoggerAwareInterface*/ {
 	/*use LoggerAwareTrait;*/
 
 	const WEBSOCKET_URL = 'wss://api.bitfinex.com/ws/2';
+	const PUBLIC_WEBSOCKET_URL = 'wss://api-pub.bitfinex.com/ws/2';
 
 	/** @var LoggerInterface */
 	protected $logger;
@@ -93,7 +94,7 @@ class BitfinexWebsocket /*implements LoggerAwareInterface*/ {
 	public function connect(): PromiseInterface {
 		$this->logger->debug('Bitfinex connection requested');
 		$connector = new Connector($this->loop);
-		return $connector(self::WEBSOCKET_URL, [], ['Origin' => $this->origin])->then(function(WebSocket $conn) {
+		return $connector($this->getConnectionUrl(), [], ['Origin' => $this->origin])->then(function(WebSocket $conn) {
 			$this->connection = $conn;
 			$this->logger->debug('Websocket connection created');
 
@@ -212,6 +213,10 @@ class BitfinexWebsocket /*implements LoggerAwareInterface*/ {
 
 	protected function isRunning(): bool {
 		return $this->connection !== null;
+	}
+
+	protected function getConnectionUrl(): string {
+	    return $this->authChannel->isAuthenticatedChannelRequired() ? self::WEBSOCKET_URL : self::PUBLIC_WEBSOCKET_URL;
 	}
 
 	protected function reconnect(int $delay) {

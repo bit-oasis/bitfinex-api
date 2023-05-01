@@ -72,7 +72,7 @@ class AuthenticatedChannel extends ConnectionWebsocketSubscriberAdapter implemen
 	}
 
 	public function isAuthenticatedChannelRequired(): bool {
-		return true;
+		return $this->isAuthChannelRequired();
 	}
 
 	public function onWebsocketConnected(WebSocket $conn, $version) {
