@@ -92,9 +92,10 @@ class BitfinexWebsocket /*implements LoggerAwareInterface*/ {
 	}
 
 	public function connect(): PromiseInterface {
-		$this->logger->debug('Bitfinex connection requested');
+		$url = $this->getConnectionUrl();
+		$this->logger->debug('Bitfinex connection requested to endpoint: ' . $url);
 		$connector = new Connector($this->loop);
-		return $connector($this->getConnectionUrl(), [], ['Origin' => $this->origin])->then(function(WebSocket $conn) {
+		return $connector($url, [], ['Origin' => $this->origin])->then(function(WebSocket $conn) {
 			$this->connection = $conn;
 			$this->logger->debug('Websocket connection created');
 
