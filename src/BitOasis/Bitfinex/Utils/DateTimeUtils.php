@@ -32,7 +32,7 @@ class DateTimeUtils {
 	 * @return int
 	 */
 	public static function getUnixTimestamp(int $timestamp): int {
-		return (int)$timestamp / 1000;
+		return (int)($timestamp / 1000);
 	}
 
 }
