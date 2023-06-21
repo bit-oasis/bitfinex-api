@@ -183,6 +183,25 @@ final class Symbol {
 	const TXAUTBTC = 'tXAUT:BTC';
 	const TARBUSD = 'tARBUSD';
 	const TARBUST = 'tARBUST';
+	const TAPEUSD = 'tAPEUSD';
+	const TAPEUST = 'tAPEUST';
+	const TSANDUSD = 'tSAND:USD';
+	const TSANDUST = 'tSAND:UST';
+	const TLDOUSD = 'tLDOUSD';
+	const TLDOUST = 'tLDOUST';
+	const TFETUSD = 'tFETUSD';
+	const TFETUST = 'tFETUST';
+	const TXDCUSD = 'tXDCUSD';
+	const TXDCUST = 'tXDCUST';
+	const TBTGUSD = 'tBTGUSD';
+	const TRLYUSD = 'tRLYUSD';
+	const TRLYUST = 'tRLYUST';
+	const TRBTUSD = 'tRBTUSD';
+	const TVRAUSD = 'tVRAUSD';
+	const TVRAUST = 'tVRAUST';
+	const TUTKUSD = 'tUTKUSD';
+	const TSGBUSD = 'tSGBUSD';
+	const TSGBUST = 'tSGBUST';
 
 	public static function isTrading(string $symbol): bool {
 		return $symbol !== '' && $symbol[0] === 't';
