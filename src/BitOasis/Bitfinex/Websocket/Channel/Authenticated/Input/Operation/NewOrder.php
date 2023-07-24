@@ -25,7 +25,7 @@ class NewOrder implements Operation {
 	/** @var string */
 	protected $symbol;
 
-	/** @var float|string */
+	/** @var string */
 	protected $amount;
 
 	/** @var float|null */
@@ -49,7 +49,7 @@ class NewOrder implements Operation {
 	/** @var array|null */
 	protected $meta;
 
-	public function __construct(int $cid, string $type, string $symbol, float $amount, float $price = null, float $priceAuxLimit = null, array $meta = null) {
+	public function __construct(int $cid, string $type, string $symbol, string $amount, float $price = null, float $priceAuxLimit = null, array $meta = null) {
 		$this->cid = $cid;
 		$this->type = $type;
 		$this->symbol = $symbol;
@@ -113,7 +113,7 @@ class NewOrder implements Operation {
 			'cid' => $this->cid,
 			'type' => $this->type,
 			'symbol' => $this->symbol,
-			'amount' => (string)$this->amount,
+			'amount' => $this->amount,
 		];
 		if ($this->gid !== null) {
 			$data['gid'] = $this->gid;

@@ -70,7 +70,7 @@ class OrderMessage {
 	/** @var array */
 	protected $meta;
 
-	public function __construct(int $id, /*?int */$gid, int $cid, string $symbol, int $timestampCreated, /*?int */ $timestampUpdated, float $remainingAmount, float $originalAmount, string $type, /*?string */$previousType, string $orderStatus, float $price, float $avgPrice, /*?float */$trailingPrice, /*?float */$auxLimitPrice, bool $notify, bool $hidden, int $placedId = null, array $meta = []) {
+	public function __construct(int $id, /*?int */$gid, int $cid, string $symbol, int $timestampCreated, /*?int */ $timestampUpdated, string $remainingAmount, string $originalAmount, string $type, /*?string */$previousType, string $orderStatus, float $price, float $avgPrice, /*?float */$trailingPrice, /*?float */$auxLimitPrice, bool $notify, bool $hidden, int $placedId = null, array $meta = []) {
 		$this->id = $id;
 		$this->gid = $gid;
 		$this->cid = $cid;
@@ -192,16 +192,16 @@ class OrderMessage {
 	}
 
 	/**
-	 * @return float
+	 * @return string
 	 */
-	public function getOriginalAmount(): float {
+	public function getOriginalAmount(): string {
 		return $this->originalAmount;
 	}
 
 	/**
-	 * @return float
+	 * @return string
 	 */
-	public function getOriginalAmountAbs(): float {
+	public function getOriginalAmountAbs(): string {
 		return abs($this->originalAmount);
 	}
 
