@@ -4,6 +4,7 @@ namespace BitOasis\Bitfinex\Websocket\Channel\Authenticated\Order;
 
 use BitOasis\Bitfinex\Utils\DateTimeUtils;
 use BitOasis\Bitfinex\Constant\OrderType;
+use Brick\Math\BigDecimal;
 
 /**
  * @author Daniel Robenek <daniel.robenek@me.com>
@@ -31,10 +32,10 @@ class OrderMessage {
 	/** @var int|null in milliseconds */
 	protected $timestampUpdated;
 
-	/** @var float */
+	/** @var BigDecimal */
 	protected $remainingAmount;
 
-	/** @var float */
+	/** @var BigDecimal */
 	protected $originalAmount;
 
 	/** @var string */
@@ -77,8 +78,8 @@ class OrderMessage {
 		$this->symbol = $symbol;
 		$this->timestampCreated = $timestampCreated;
 		$this->timestampUpdated = $timestampUpdated;
-		$this->remainingAmount = $remainingAmount;
-		$this->originalAmount = $originalAmount;
+		$this->remainingAmount = BigDecimal::of($remainingAmount);
+		$this->originalAmount = BigDecimal::of($originalAmount);
 		$this->type = $type;
 		$this->previousType = $previousType;
 		$this->orderStatus = $orderStatus;
@@ -178,17 +179,17 @@ class OrderMessage {
 	}
 
 	/**
-	 * @return float
+	 * @return string
 	 */
-	public function getRemainingAmount(): float {
+	public function getRemainingAmount(): string {
 		return $this->remainingAmount;
 	}
 
 	/**
-	 * @return float
+	 * @return string
 	 */
-	public function getRemainingAmountAbs(): float {
-		return abs($this->remainingAmount);
+	public function getRemainingAmountAbs(): string {
+		return $this->remainingAmount->abs();
 	}
 
 	/**
@@ -202,7 +203,14 @@ class OrderMessage {
 	 * @return string
 	 */
 	public function getOriginalAmountAbs(): string {
-		return abs($this->originalAmount);
+		return $this->originalAmount->abs();
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getExecutedAmount(): string {
+		return $this->originalAmount->abs()->minus($this->remainingAmount->abs());
 	}
 
 	/**
@@ -318,7 +326,7 @@ class OrderMessage {
 	public function isStatusPartiallyFilled(): bool {
 		$status = $this->orderStatus;
 
-		if ($this->remainingAmount === 0.0 || $this->remainingAmount === $this->originalAmount) {
+		if ($this->remainingAmount->isZero() || $this->remainingAmount->isEqualTo($this->originalAmount)) {
 			return false;
 		}
 
@@ -369,14 +377,14 @@ class OrderMessage {
 	 * @return bool
 	 */
 	public function isBuy(): bool {
-		return $this->originalAmount > 0;
+		return $this->originalAmount->isPositive();
 	}
 
 	/**
 	 * @return bool
 	 */
 	public function isSell(): bool {
-		return $this->originalAmount < 0;
+		return $this->originalAmount->isNegative();
 	}
 
 	/**
