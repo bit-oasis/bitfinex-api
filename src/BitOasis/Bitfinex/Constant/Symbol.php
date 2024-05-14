@@ -202,6 +202,15 @@ final class Symbol {
 	const TUTKUSD = 'tUTKUSD';
 	const TSGBUSD = 'tSGBUSD';
 	const TSGBUST = 'tSGBUST';
+	const TBLURUSD = 'tBLUR:USD';
+	const TOPXUSD = 'tOPXUSD';
+	const TQRDOUSD = 'tQRDO:USD';
+	const TBOSONUSD = 'tBOSON:USD';
+	const TFLOKIUSD = 'tFLOKI:USD';
+	const TWILDUSD = 'tWILD:USD';
+	const TSUIUSD = 'tSUIUSD';
+	const TSEIUSD = 'tSEIUSD';
+	const TTONUSD = 'tTONUSD';
 
 	public static function isTrading(string $symbol): bool {
 		return $symbol !== '' && $symbol[0] === 't';
