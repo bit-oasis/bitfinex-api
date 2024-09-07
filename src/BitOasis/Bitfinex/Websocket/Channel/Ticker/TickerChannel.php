@@ -67,7 +67,15 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 			if ($data[1] === 'hb') {
 				return;
 			}
+
 			$update = $data[1];
+			$requiredIndices = [0, 2, 4, 5, 6, 8, 9];
+			foreach ($requiredIndices as $index) {
+				if (!isset($update[$index])) {
+					return;
+				}
+			}
+
 			$message = new TickerMessage($update[0], $update[2], $update[4], $update[5] * 100, $update[6], $update[8], $update[9]);
 			foreach ($this->subscribers as $subscriber) {
 				$subscriber->onTickerUpdateReceived($message);
