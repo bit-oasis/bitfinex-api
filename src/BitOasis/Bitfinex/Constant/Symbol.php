@@ -267,6 +267,8 @@ final class Symbol {
 	const TWOOUST = 'tWOOUST';
 	const TXTPUSD = 'tXTPUSD';
 	const TXTPUST = 'tXTPUST';
+	const TPOLUSD = 'tPOLUSD';
+	const TPOLUST = 'tPOLUST';
 
 	public static function isTrading(string $symbol): bool {
 		return $symbol !== '' && $symbol[0] === 't';
