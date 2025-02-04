@@ -292,7 +292,6 @@ final class Symbol {
 	const TSPECUSD = 'tSPEC:USD';
 	const TSPECUST = 'tSPEC:UST';
 	const TAIOZUSD = 'tAIOZ:USD';
-	const TAIOZUST = 'tAIOZ:UST';
 	const TGOMININGUSD = 'tGOMINING:USD';
 	const TGOMININGUST = 'tGOMINING:UST';
 	const TVELARUSD = 'tVELAR:USD';
