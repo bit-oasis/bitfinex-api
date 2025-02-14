@@ -300,6 +300,8 @@ final class Symbol {
 	const TJUSTICEUST = 'tJUSTICE:UST';
 	const TKANUSD = 'tKANUSD';
 	const TKANUST = 'tKANUST';
+	const TSONICUSD = 'tSONICUSD';
+	const TSONICUST = 'tSONICUST';
 
 	public static function isTrading(string $symbol): bool {
 		return $symbol !== '' && $symbol[0] === 't';
