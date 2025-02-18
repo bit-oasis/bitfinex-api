@@ -285,6 +285,24 @@ final class Symbol {
 	const TMEWUST = 'tMEWUST';
 	const TTIAUSD = 'tTIAUSD';
 	const TTIAUST = 'tTIAUST';
+
+	const TSWEATUSD = 'tSWEAT:USD';
+	const TSWEATUST = 'tSWEAT:UST';
+	const TDOPUSD = 'tDOPUSD';
+	const TDOPUST = 'tDOPUST';
+	const TSPECUSD = 'tSPEC:USD';
+	const TSPECUST = 'tSPEC:UST';
+	const TAIOZUSD = 'tAIOZ:USD';
+	const TGOMININGUSD = 'tGOMINING:USD';
+	const TGOMININGUST = 'tGOMINING:UST';
+	const TVELARUSD = 'tVELAR:USD';
+	const TVELARUST = 'tVELAR:UST';
+	const TJUSTICEUSD = 'tJUSTICE:USD';
+	const TJUSTICEUST = 'tJUSTICE:UST';
+	const TKANUSD = 'tKANUSD';
+	const TKANUST = 'tKANUST';
+	const TSONICUSD = 'tSONIC:USD';
+	const TSONICUST = 'tSONIC:UST';
 	const TTOKENUSD = 'tTOKEN:USD';
 	const TTOKENUST = 'tTOKEN:UST';
 	const TEIGENUSD = 'tEIGEN:USD';
