@@ -285,6 +285,7 @@ final class Symbol {
 	const TMEWUST = 'tMEWUST';
 	const TTIAUSD = 'tTIAUSD';
 	const TTIAUST = 'tTIAUST';
+
 	const TSWEATUSD = 'tSWEAT:USD';
 	const TSWEATUST = 'tSWEAT:UST';
 	const TDOPUSD = 'tDOPUSD';
@@ -302,6 +303,20 @@ final class Symbol {
 	const TKANUST = 'tKANUST';
 	const TSONICUSD = 'tSONIC:USD';
 	const TSONICUST = 'tSONIC:UST';
+	const TTOKENUSD = 'tTOKEN:USD';
+	const TTOKENUST = 'tTOKEN:UST';
+	const TEIGENUSD = 'tEIGEN:USD';
+	const TEIGENUST = 'tEIGEN:UST';
+	const TJASMYUSD = 'tJASMY:USD';
+	const TJASMYUST = 'tJASMY:UST';
+	const TSTRKUSD = 'tSTRK:USD';
+	const TSTRKUST = 'tSTRK:UST';
+	const TATHUSD = 'tATHUSD';
+	const TATHUST = 'tATHUST';
+	const TBGBUSD = 'tBGBUSD';
+	const TBGBUST = 'tBGBUST';
+	const TKARATEUSD = 'tKARATE:USD';
+	const TKARATEUST = 'tKARATE:UST';
 
 	public static function isTrading(string $symbol): bool {
 		return $symbol !== '' && $symbol[0] === 't';
