@@ -315,8 +315,6 @@ final class Symbol {
 	const TATHUST = 'tATHUST';
 	const TBGBUSD = 'tBGBUSD';
 	const TBGBUST = 'tBGBUST';
-	const TXEGLDUSD = 'tEGLD:USD';
-	const TXEGLDUST = 'tEGLD:UST';
 	const TKARATEUSD = 'tKARATE:USD';
 	const TKARATEUST = 'tKARATE:UST';
 
