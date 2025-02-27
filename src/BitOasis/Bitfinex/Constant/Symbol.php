@@ -315,8 +315,6 @@ final class Symbol {
 	const TATHUST = 'tATHUST';
 	const TBGBUSD = 'tBGBUSD';
 	const TBGBUST = 'tBGBUST';
-	const TKARATEUSD = 'tKARATE:USD';
-	const TKARATEUST = 'tKARATE:UST';
 
 	public static function isTrading(string $symbol): bool {
 		return $symbol !== '' && $symbol[0] === 't';
