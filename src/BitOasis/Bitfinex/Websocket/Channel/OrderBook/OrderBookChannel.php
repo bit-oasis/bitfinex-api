@@ -115,7 +115,7 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 				$this->subscribeDeferred = null;
 			}
 
-			$this->throwCodeBasedException($data);
+			$this->throwCodeBasedException($data['code'], $data['symbol'], $data['msg']);
 		}
 	}
 

@@ -94,7 +94,7 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 				$this->subscribeDeferred = null;
 			}
 
-			$this->throwCodeBasedException($data);
+			$this->throwCodeBasedException($data['code'], $data['symbol'], $data['msg']);
 		}
 	}
 
