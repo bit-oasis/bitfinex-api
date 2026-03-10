@@ -41,10 +41,11 @@ abstract class BitfinexPublicChannel extends ConnectionWebsocketSubscriberAdapte
 	 */
 	protected function throwCodeBasedException(int $errorCode, string $errorMessage, string $symbol) {
 		$channelName = $this->getChannelName();
-		switch ($errorCode) {
-			case 10300: throw new InvalidSymbolException("Can't subscribe to $channelName channel for symbol $symbol. Symbol is invalid.");
-			default: throw new SubscriptionFailedException("Can't subscribe to $channelName channel: $errorMessage ($errorCode)");
+		if ($errorCode === 10300) {
+			throw new InvalidSymbolException("Can't subscribe to $channelName channel for symbol $symbol. Symbol is invalid.");
 		}
+
+		throw new SubscriptionFailedException("Can't subscribe to $channelName channel: $errorMessage ($errorCode)");
 	}
 
 	public function onMaintenanceEnded(WebSocket $conn) {
