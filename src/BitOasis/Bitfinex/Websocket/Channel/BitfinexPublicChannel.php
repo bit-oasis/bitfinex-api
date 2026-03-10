@@ -3,11 +3,11 @@
 namespace BitOasis\Bitfinex\Websocket\Channel;
 
 use BitOasis\Bitfinex\Constant\Symbol;
+use BitOasis\Bitfinex\Exception\InvalidSymbolException;
 use BitOasis\Bitfinex\Exception\SubscriptionFailedException;
+use BitOasis\Bitfinex\Websocket\ConnectionWebsocketSubscriberAdapter;
 use Ratchet\Client\WebSocket;
 use React\Promise\Promise;
-use BitOasis\Bitfinex\Websocket\ConnectionWebsocketSubscriberAdapter;
-use BitOasis\Bitfinex\Exception\InvalidSymbolException;
 
 /**
  * @author David Fiedor <davefu@seznam.cz>
