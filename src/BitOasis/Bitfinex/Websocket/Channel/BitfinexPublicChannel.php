@@ -3,10 +3,11 @@
 namespace BitOasis\Bitfinex\Websocket\Channel;
 
 use BitOasis\Bitfinex\Constant\Symbol;
+use BitOasis\Bitfinex\Exception\InvalidSymbolException;
+use BitOasis\Bitfinex\Exception\SubscriptionFailedException;
+use BitOasis\Bitfinex\Websocket\ConnectionWebsocketSubscriberAdapter;
 use Ratchet\Client\WebSocket;
 use React\Promise\Promise;
-use BitOasis\Bitfinex\Websocket\ConnectionWebsocketSubscriberAdapter;
-use BitOasis\Bitfinex\Exception\InvalidSymbolException;
 
 /**
  * @author David Fiedor <davefu@seznam.cz>
@@ -34,6 +35,19 @@ abstract class BitfinexPublicChannel extends ConnectionWebsocketSubscriberAdapte
 		}
 	}
 
+	/**
+	 * @throws SubscriptionFailedException
+	 * @throws InvalidSymbolException
+	 */
+	protected function throwCodeBasedException(int $errorCode, string $symbol, string $errorMessage) {
+		$channelName = $this->getChannelName();
+		if ($errorCode === 10300) {
+			throw new InvalidSymbolException("Can't subscribe to $channelName channel for symbol $symbol. Symbol is invalid.");
+		}
+
+		throw new SubscriptionFailedException("Can't subscribe to $channelName channel: $errorMessage ($errorCode)");
+	}
+
 	public function onMaintenanceEnded(WebSocket $conn) {
 		$this->unsubscribe($conn)->done(function() {
 			$this->subscribe($this->connection);
@@ -43,5 +57,7 @@ abstract class BitfinexPublicChannel extends ConnectionWebsocketSubscriberAdapte
 	abstract protected function subscribe(WebSocket $conn): Promise;
 
 	abstract protected function unsubscribe(WebSocket $conn): Promise;
+
+	abstract protected function getChannelName(): string;
 
 }

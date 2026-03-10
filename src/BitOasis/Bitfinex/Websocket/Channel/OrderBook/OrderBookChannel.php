@@ -114,7 +114,8 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 				$this->subscribeDeferred->reject();
 				$this->subscribeDeferred = null;
 			}
-			throw new SubscriptionFailedException("Can't subscribe to orderbook channel: $data[msg] ($data[code])"); // todo: handle specific situations
+
+			$this->throwCodeBasedException($data['code'], $data['symbol'], $data['msg']);
 		}
 	}
 
@@ -195,6 +196,10 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 			$this->unsubscribeDeferred = new Deferred();
 		}
 		return $this->unsubscribeDeferred->promise();
+	}
+
+	protected function getChannelName(): string {
+		return self::CHANNEL_NAME;
 	}
 
 	protected function removeStoppedChannelData() {

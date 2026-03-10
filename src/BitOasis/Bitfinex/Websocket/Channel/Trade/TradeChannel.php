@@ -88,12 +88,13 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 
 	public function onWebsocketErrorMessage($data) {
 		if ($this->areChannelDataValid($data)) {
-			$this->logger->error("Can't subscribe to orderbook channel: {message} ({code})", ['message' => $data['msg'], 'code' => $data['code']]);
+			$this->logger->error("Can't subscribe to trade channel: {message} ({code})", ['message' => $data['msg'], 'code' => $data['code']]);
 			if ($this->subscribeDeferred !== null) {
 				$this->subscribeDeferred->reject();
 				$this->subscribeDeferred = null;
 			}
-			throw new SubscriptionFailedException("Can't subscribe to orderbook channel: $data[msg] ($data[code])"); // todo: handle specific situations
+
+			$this->throwCodeBasedException($data['code'], $data['symbol'], $data['msg']);
 		}
 	}
 
@@ -166,6 +167,10 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 			$this->unsubscribeDeferred = new Deferred();
 		}
 		return $this->unsubscribeDeferred->promise();
+	}
+
+	protected function getChannelName(): string {
+		return self::CHANNEL_NAME;
 	}
 
 	protected function removeStoppedChannelData() {
