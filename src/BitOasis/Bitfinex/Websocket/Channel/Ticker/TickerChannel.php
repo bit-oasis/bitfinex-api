@@ -85,7 +85,7 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 
 	public function onWebsocketErrorMessage($data) {
 		if ($this->areChannelDataValid($data)) {
-			$this->logger->error("Can't subscribe to orderbook channel: {message} ({code})", ['message' => $data['msg'], 'code' => $data['code']]);
+			$this->logger->error("Can't subscribe to ticker channel: {message} ({code})", ['message' => $data['msg'], 'code' => $data['code']]);
 			if ($this->subscribeDeferred !== null) {
 				$this->subscribeDeferred->reject();
 				$this->subscribeDeferred = null;
