@@ -4,6 +4,8 @@ namespace BitOasis\Bitfinex\Websocket;
 
 use BitOasis\Bitfinex\Exception\AuthenticationFailedException;
 use BitOasis\Bitfinex\Exception\CannotAddSubscriberException;
+use BitOasis\Bitfinex\Exception\InvalidSymbolException;
+use BitOasis\Bitfinex\Exception\SubscriptionFailedException;
 use BitOasis\Bitfinex\Websocket\Channel\Authenticated\AuthenticatedChannel;
 use BitOasis\Bitfinex\Websocket\Channel\Authenticated\AuthenticatedSubchannel;
 use Nette\Utils\Json;
@@ -131,8 +133,14 @@ class BitfinexWebsocket /*implements LoggerAwareInterface*/ {
 					}
 				} else if($event === 'error') {
 					$this->logger->warning('Error event received: {error}', ['error' => $stringMsg]);
-					foreach ($this->subscribers as $subscriber) {
-						$subscriber->onWebsocketErrorMessage($data);
+					foreach ($this->subscribers as $index => $subscriber) {
+						try {
+							$subscriber->onWebsocketErrorMessage($data);
+						} catch (InvalidSymbolException $e) {
+							// No need to stop processing when symbol is invalid, error log is enough
+							$this->logger->error("Removed Subscription for failed subscriber {subscriber}", ['subscriber' => $subscriber]);
+							unset($this->subscribers[$index]);
+						}
 					}
 				} else if ($event === 'info') {
 					if (isset($data['version']) && !isset($data['code'])) {

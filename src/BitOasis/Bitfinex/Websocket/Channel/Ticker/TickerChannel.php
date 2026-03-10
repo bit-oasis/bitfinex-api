@@ -90,7 +90,8 @@ class TickerChannel extends BitfinexPublicChannel implements LoggerAwareInterfac
 				$this->subscribeDeferred->reject();
 				$this->subscribeDeferred = null;
 			}
-			throw new SubscriptionFailedException("Can't subscribe to orderbook channel: $data[msg] ($data[code])"); // todo: handle specific situations
+
+			$this->throwCodeBasedException($data);
 		}
 	}
 

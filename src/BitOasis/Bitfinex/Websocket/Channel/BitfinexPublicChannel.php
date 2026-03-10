@@ -3,6 +3,7 @@
 namespace BitOasis\Bitfinex\Websocket\Channel;
 
 use BitOasis\Bitfinex\Constant\Symbol;
+use BitOasis\Bitfinex\Exception\SubscriptionFailedException;
 use Ratchet\Client\WebSocket;
 use React\Promise\Promise;
 use BitOasis\Bitfinex\Websocket\ConnectionWebsocketSubscriberAdapter;
@@ -31,6 +32,17 @@ abstract class BitfinexPublicChannel extends ConnectionWebsocketSubscriberAdapte
 	protected function validateSymbol(string $symbol) {
 		if (!Symbol::isTrading($symbol)) {
 			throw new InvalidSymbolException('Only trading symbols are supported');
+		}
+	}
+
+	/**
+	 * @throws SubscriptionFailedException
+	 * @throws InvalidSymbolException
+	 */
+	protected function throwCodeBasedException(array $data) {
+		switch ($data['code']) {
+			case 10300: throw new InvalidSymbolException("Can't subscribe to orderbook channel for symbol {$data['symbol']}. Symbol is invalid.");
+			default: throw new SubscriptionFailedException("Can't subscribe to orderbook channel: $data[msg] ($data[code])");
 		}
 	}
 
