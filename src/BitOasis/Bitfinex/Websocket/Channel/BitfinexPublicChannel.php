@@ -40,9 +40,10 @@ abstract class BitfinexPublicChannel extends ConnectionWebsocketSubscriberAdapte
 	 * @throws InvalidSymbolException
 	 */
 	protected function throwCodeBasedException(array $data) {
+		$channelName = $this->getChannelName();
 		switch ($data['code']) {
-			case 10300: throw new InvalidSymbolException("Can't subscribe to orderbook channel for symbol {$data['symbol']}. Symbol is invalid.");
-			default: throw new SubscriptionFailedException("Can't subscribe to orderbook channel: $data[msg] ($data[code])");
+			case 10300: throw new InvalidSymbolException("Can't subscribe to $channelName channel for symbol {$data['symbol']}. Symbol is invalid.");
+			default: throw new SubscriptionFailedException("Can't subscribe to $channelName channel: $data[msg] ($data[code])");
 		}
 	}
 
@@ -55,5 +56,7 @@ abstract class BitfinexPublicChannel extends ConnectionWebsocketSubscriberAdapte
 	abstract protected function subscribe(WebSocket $conn): Promise;
 
 	abstract protected function unsubscribe(WebSocket $conn): Promise;
+
+	abstract protected function getChannelName(): string;
 
 }

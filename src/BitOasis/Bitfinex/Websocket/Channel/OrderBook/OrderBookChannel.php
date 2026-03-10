@@ -198,6 +198,10 @@ class OrderBookChannel extends BitfinexPublicChannel implements LoggerAwareInter
 		return $this->unsubscribeDeferred->promise();
 	}
 
+	protected function getChannelName(): string {
+		return self::CHANNEL_NAME;
+	}
+
 	protected function removeStoppedChannelData() {
 		if ($this->channelId !== null) {
 			$this->hb->removeChannel($this->channelId);

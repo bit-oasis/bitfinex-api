@@ -169,6 +169,10 @@ class TradeChannel extends BitfinexPublicChannel implements LoggerAwareInterface
 		return $this->unsubscribeDeferred->promise();
 	}
 
+	protected function getChannelName(): string {
+		return self::CHANNEL_NAME;
+	}
+
 	protected function removeStoppedChannelData() {
 		if ($this->channelId !== null) {
 			$this->hb->removeChannel($this->channelId);
