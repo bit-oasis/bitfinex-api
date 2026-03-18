@@ -318,6 +318,27 @@ final class Symbol {
 	const TSKYUSD = 'tSKYUSD';
 	const TSKYUST = 'tSKYUST';
 
+	const TMNTUSD = 'tMNTUSD';
+	const TMNTUST = 'tMNTUST';
+
+	const TGTXUSD = 'tGTXUSD';
+	const TGTXUST = 'tGTXUST';
+
+	const TZROUSD = 'tZROUSD';
+	const TZROUST = 'tZROUST';
+
+	const TUSATUSD = 'tUSAT:USD';
+	const TUSATUST = 'tUSAT:UST';
+
+	const TRLSUSD = 'tRLSUSD';
+	const TRLSUST = 'tRLSUST';
+
+	const TLIFIIIUSD = 'tLIFIII:USD';
+	const TLIFIIIUST = 'tLIFIII:UST';
+
+	const TB2MUSD = 'tB2MUSD';
+	const TB2MUST = 'tB2MUST';
+
 	public static function isTrading(string $symbol): bool {
 		return $symbol !== '' && $symbol[0] === 't';
 	}
