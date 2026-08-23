@@ -339,6 +339,9 @@ final class Symbol {
 	const TB2MUSD = 'tB2MUSD';
 	const TB2MUST = 'tB2MUST';
 
+	const THYPEUSD = 'tHYPE:USD';
+	const THYPEUST = 'tHYPE:UST';
+
 	public static function isTrading(string $symbol): bool {
 		return $symbol !== '' && $symbol[0] === 't';
 	}
